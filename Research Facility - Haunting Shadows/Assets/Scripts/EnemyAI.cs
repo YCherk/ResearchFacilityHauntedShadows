@@ -13,6 +13,7 @@ public class EnemyAI : MonoBehaviour
     public float backSightDistance = 5.0f;
     public float fieldOfView = 60.0f;
     public float backFieldOfView = 90.0f;
+    public AudioSource walkingAudio;
 
     private float timer;
     private NavMeshAgent agent;
@@ -148,6 +149,7 @@ public class EnemyAI : MonoBehaviour
         }
 
         animator.SetBool("WalkForward", agent.velocity.magnitude > 0.01f);
+        walkingAudio.Play();
     }
 
     public static Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
