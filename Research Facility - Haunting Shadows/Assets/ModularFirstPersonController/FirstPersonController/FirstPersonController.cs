@@ -16,6 +16,11 @@ using UnityEngine.UI;
 
 public class FirstPersonController : MonoBehaviour
 {
+    public AudioSource walkAudioSource;
+    public AudioSource runAudioSource;
+    public AudioSource jumpAudioSource;
+    public AudioSource staminaDepletedAudioSource;
+
     private Rigidbody rb;
 
     #region Camera Movement Variables
@@ -370,6 +375,16 @@ public class FirstPersonController : MonoBehaviour
 
         if (playerCanMove)
         {
+            if (!isWalking && walkAudioSource.isPlaying)
+            {
+                walkAudioSource.Stop();
+            }
+
+            if (!isSprinting && runAudioSource.isPlaying)
+            {
+                runAudioSource.Stop();
+            }
+
             // Calculate how fast we should be moving
             Vector3 targetVelocity = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
 
@@ -378,6 +393,12 @@ public class FirstPersonController : MonoBehaviour
             if (targetVelocity.x != 0 || targetVelocity.z != 0 && isGrounded)
             {
                 isWalking = true;
+
+                if (isWalking && !isSprinting && !walkAudioSource.isPlaying)
+                {
+                    walkAudioSource.Play();
+                }
+
             }
             else
             {
@@ -388,6 +409,23 @@ public class FirstPersonController : MonoBehaviour
             if (enableSprint && Input.GetKey(sprintKey) && sprintRemaining > 0f && !isSprintCooldown)
             {
                 targetVelocity = transform.TransformDirection(targetVelocity) * sprintSpeed;
+
+                if (isSprinting && !runAudioSource.isPlaying)
+                {
+                    runAudioSource.Play();
+                    walkAudioSource.Stop(); // Stop walking sound if it's playing
+                }
+
+                if (!unlimitedSprint)
+                {
+                    sprintRemaining -= 1 * Time.deltaTime;
+                    if (sprintRemaining <= 0 && !staminaDepletedAudioSource.isPlaying)
+                    {
+                        staminaDepletedAudioSource.Play(); // Play stamina depleted sound
+                        isSprinting = false;
+                        isSprintCooldown = true;
+                    }
+                }
 
                 // Apply a force that attempts to reach our target velocity
                 Vector3 velocity = rb.velocity;
@@ -461,19 +499,19 @@ public class FirstPersonController : MonoBehaviour
 
     private void Jump()
     {
-        // Adds force to the player rigidbody to jump
         if (isGrounded)
         {
             rb.AddForce(0f, jumpPower, 0f, ForceMode.Impulse);
             isGrounded = false;
+            jumpAudioSource.Play(); // Play jump sound
         }
 
-        // When crouched and using toggle system, will uncrouch for a jump
-        if(isCrouched && !holdToCrouch)
+        if (isCrouched && !holdToCrouch)
         {
             Crouch();
         }
     }
+
 
     private void Crouch()
     {
@@ -728,8 +766,21 @@ public class FirstPersonController : MonoBehaviour
 
         #endregion
 
+        #region Audio Setup
+
+        EditorGUILayout.LabelField("", GUI.skin.horizontalSlider);
+        GUILayout.Label("Audio Setup", new GUIStyle(GUI.skin.label) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold, fontSize = 13 }, GUILayout.ExpandWidth(true));
+        EditorGUILayout.Space();
+
+        fpc.walkAudioSource = (AudioSource)EditorGUILayout.ObjectField("Walk Audio Source", fpc.walkAudioSource, typeof(AudioSource), true);
+        fpc.runAudioSource = (AudioSource)EditorGUILayout.ObjectField("Run Audio Source", fpc.runAudioSource, typeof(AudioSource), true);
+        fpc.jumpAudioSource = (AudioSource)EditorGUILayout.ObjectField("Jump Audio Source", fpc.jumpAudioSource, typeof(AudioSource), true);
+        fpc.staminaDepletedAudioSource = (AudioSource)EditorGUILayout.ObjectField("Stamina Depleted Audio Source", fpc.staminaDepletedAudioSource, typeof(AudioSource), true);
+
+        #endregion
+
         //Sets any changes from the prefab
-        if(GUI.changed)
+        if (GUI.changed)
         {
             EditorUtility.SetDirty(fpc);
             Undo.RecordObject(fpc, "FPC Change");

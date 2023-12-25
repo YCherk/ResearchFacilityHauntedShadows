@@ -19,6 +19,7 @@ public class EnemyAI : MonoBehaviour
     public AudioSource runningAudioSource;
     public AudioSource attackAudioSource;
 
+
     private float timer;
     private NavMeshAgent agent;
     private Animator animator;
@@ -43,11 +44,9 @@ public class EnemyAI : MonoBehaviour
 
         if (canSeePlayer || canSeePlayerFromBehind)
         {
-            if (!isChasingPlayer)
-            {
-                TurnTowardsPlayer();
-                agent.speed = chaseSpeed; // Increase speed when starting to chase
-            }
+            TurnTowardsPlayer(); // Continuously turn towards the player during the chase
+            agent.speed = chaseSpeed; // Increase speed when starting to chase
+
             isChasingPlayer = true;
             isSearchingForPlayer = false;
             lastKnownPlayerPosition = player.position;
@@ -98,6 +97,7 @@ public class EnemyAI : MonoBehaviour
         // Handle audio based on the enemy state
         HandleAudioPlayback();
     }
+
 
     void HandleAudioPlayback()
     {

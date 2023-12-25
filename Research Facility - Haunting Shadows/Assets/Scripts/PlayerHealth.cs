@@ -11,12 +11,16 @@ public class PlayerHealth : MonoBehaviour
     public RawImage bloodSplatterRawImage; // Assign this in the inspector
     public Image screenTintPanel; // Assign a full-screen Panel in the inspector
     public ScreenFader screenFader;
+    public AudioClip[] damageAudioClips;
+    private int currentAudioClipIndex = 0;
 
     public float splatterDuration = 0.2f; // Short duration for blood splatter
     public float pulseDuration = 1f; // Duration for each pulse
     public float maxPulseAlpha = 0.4f; // Maximum alpha value for pulsing (adjustable in inspector)
     public int healthThresholdForPulse = 30; // Health threshold below which screen will pulse
     public float tintIntensity = 0.5f; // Control the intensity of the screen tint
+    public AudioSource damageAudioSource;
+    public AudioSource stabSound;
 
     private bool isPulsing = false; // Track pulsing status
 
@@ -33,6 +37,22 @@ public class PlayerHealth : MonoBehaviour
         currentHealth -= damage;
         currentHealth = Mathf.Clamp(currentHealth, 0, maxHealth);
         UpdateHealthBar();
+
+        if(damageAudioSource != null && damageAudioClips.Length > 0)
+        {
+            damageAudioSource.clip = damageAudioClips[currentAudioClipIndex];
+            damageAudioSource.Play();
+
+            // Move to the next clip, looping back to the first if necessary
+            currentAudioClipIndex = (currentAudioClipIndex + 1) % damageAudioClips.Length;
+        }
+        
+            if (stabSound != null && !stabSound.isPlaying)
+            {
+                stabSound.Play();
+            }
+        
+
 
         // Ensure the screen tint panel is enabled
         if (screenTintPanel != null && !screenTintPanel.enabled)
