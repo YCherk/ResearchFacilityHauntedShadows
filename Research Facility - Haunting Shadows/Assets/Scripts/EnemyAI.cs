@@ -262,6 +262,7 @@ public class EnemyAI : MonoBehaviour
     void Patrol()
     {
         timer += Time.deltaTime;
+        animator.SetBool("WalkForward", true);
 
         if (timer >= patrolTimer)
         {
