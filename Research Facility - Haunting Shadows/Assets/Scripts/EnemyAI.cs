@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
-
+using UnityEngine.UI;
 public class EnemyAI : MonoBehaviour
 {
     public float patrolRadius = 10.0f;
@@ -18,7 +18,15 @@ public class EnemyAI : MonoBehaviour
     public AudioSource walkingAudioSource;
     public AudioSource runningAudioSource;
     public AudioSource attackAudioSource;
-   
+
+    // Microphone input and UI variables
+    public float sensitivity = 100;
+    public float loudnessThreshold = 10;
+    public Slider volumeSlider; // Assign this in the Inspector
+    public RectTransform thresholdIndicator; // Assign this in the Inspector
+    private AudioClip microphoneInput;
+    private bool isMicrophoneInitialized = false;
+
 
     private float timer;
     private NavMeshAgent agent;
@@ -34,6 +42,9 @@ public class EnemyAI : MonoBehaviour
         timer = patrolTimer;
         agent.speed = moveSpeed; // Set initial speed to patrol speed
         agent.updateRotation = false;
+        InitializeMicrophone();
+        // Initialize threshold indicator
+        InitializeThresholdIndicator();
     }
 
     void Update()
@@ -41,6 +52,18 @@ public class EnemyAI : MonoBehaviour
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         bool canSeePlayer = CanSeePlayer(distanceToPlayer);
         bool canSeePlayerFromBehind = CanSeePlayerFromBehind(distanceToPlayer);
+
+        if (isMicrophoneInitialized)
+        {
+            float micLoudness = GetAveragedVolume() * sensitivity;
+            volumeSlider.value = micLoudness; // Update the slider value
+
+            if (micLoudness > loudnessThreshold)
+            {
+                isChasingPlayer = true;
+                lastKnownPlayerPosition = player.position;
+            }
+        }
 
         if (canSeePlayer || canSeePlayerFromBehind)
         {
@@ -98,7 +121,32 @@ public class EnemyAI : MonoBehaviour
         HandleAudioPlayback();
     }
 
+    void InitializeMicrophone()
+    {
+        microphoneInput = Microphone.Start(null, true, 1, 44100);
+        isMicrophoneInitialized = true;
+    }
 
+    float GetAveragedVolume()
+    {
+        float[] data = new float[256];
+        float a = 0;
+        microphoneInput.GetData(data, 0);
+        foreach (float s in data)
+        {
+            a += Mathf.Abs(s);
+        }
+        return a / 256;
+    }
+    void InitializeThresholdIndicator()
+    {
+        if (volumeSlider != null && thresholdIndicator != null)
+        {
+            // Adjust the position of the threshold indicator based on the slider's dimensions
+            float normalizedPosition = loudnessThreshold / volumeSlider.maxValue;
+            thresholdIndicator.anchoredPosition = new Vector2(normalizedPosition * volumeSlider.GetComponent<RectTransform>().sizeDelta.x, 0);
+        }
+    }
     void HandleAudioPlayback()
     {
         // Walking audio
