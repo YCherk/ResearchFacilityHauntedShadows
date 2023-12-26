@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
@@ -23,9 +24,9 @@ public class EnemyAI : MonoBehaviour
     public float sensitivity = 100;
     public float loudnessThreshold = 10;
     public Slider volumeSlider; // Assign this in the Inspector
-    public RectTransform thresholdIndicator; // Assign this in the Inspector
     private AudioClip microphoneInput;
     private bool isMicrophoneInitialized = false;
+    public int sampleWindow = 64;
 
 
     private float timer;
@@ -43,8 +44,7 @@ public class EnemyAI : MonoBehaviour
         agent.speed = moveSpeed; // Set initial speed to patrol speed
         agent.updateRotation = false;
         InitializeMicrophone();
-        // Initialize threshold indicator
-        InitializeThresholdIndicator();
+      
     }
 
     void Update()
@@ -55,98 +55,119 @@ public class EnemyAI : MonoBehaviour
 
         if (isMicrophoneInitialized)
         {
-            float micLoudness = GetAveragedVolume() * sensitivity;
-            volumeSlider.value = micLoudness; // Update the slider value
+            int micPosition = Microphone.GetPosition(null) - sampleWindow; // Get current position of the mic recording
+            if (micPosition < 0) return;
+
+            float micLoudness = GetAveragedVolume(micPosition, microphoneInput) * sensitivity;
+            volumeSlider.value = Mathf.Clamp(micLoudness, 0, volumeSlider.maxValue);
 
             if (micLoudness > loudnessThreshold)
             {
+                TurnTowardsPlayer(); // Continuously turn towards the player during the chase
+                agent.speed = chaseSpeed; // Increase speed when starting to chase
+
                 isChasingPlayer = true;
+                isSearchingForPlayer = false;
                 lastKnownPlayerPosition = player.position;
+                agent.SetDestination(player.position);
+                animator.SetBool("isRunning", true);
+
+                if (distanceToPlayer <= attackDistance)
+                {
+                    animator.SetTrigger("IsAttack");
+                }
+                else
+                {
+                    animator.SetBool("IsAttack", false);
+                }
             }
         }
 
-        if (canSeePlayer || canSeePlayerFromBehind)
-        {
-            TurnTowardsPlayer(); // Continuously turn towards the player during the chase
-            agent.speed = chaseSpeed; // Increase speed when starting to chase
-
-            isChasingPlayer = true;
-            isSearchingForPlayer = false;
-            lastKnownPlayerPosition = player.position;
-            agent.SetDestination(player.position);
-            animator.SetBool("isRunning", true);
-
-            if (distanceToPlayer <= attackDistance)
+            if (canSeePlayer || canSeePlayerFromBehind)
             {
-                animator.SetTrigger("IsAttack");
+                TurnTowardsPlayer(); // Continuously turn towards the player during the chase
+                agent.speed = chaseSpeed; // Increase speed when starting to chase
+
+                isChasingPlayer = true;
+                isSearchingForPlayer = false;
+                lastKnownPlayerPosition = player.position;
+                agent.SetDestination(player.position);
+                animator.SetBool("isRunning", true);
+
+                if (distanceToPlayer <= attackDistance)
+                {
+                    animator.SetTrigger("IsAttack");
+                }
+                else
+                {
+                    animator.SetBool("IsAttack", false);
+                }
+            }
+            else if (isChasingPlayer)
+            {
+                isChasingPlayer = false;
+                isSearchingForPlayer = true;
+                agent.speed = moveSpeed; // Reset speed when stopping the chase
+                agent.SetDestination(lastKnownPlayerPosition);
+            }
+            else if (isSearchingForPlayer)
+            {
+                if (Vector3.Distance(transform.position, lastKnownPlayerPosition) < 1f)
+                {
+                    isSearchingForPlayer = false;
+                    animator.SetBool("isRunning", false); // Stop running after search
+                    Patrol();
+                }
+                else
+                {
+                    // Keep running if still searching
+                    animator.SetBool("isRunning", true);
+                }
             }
             else
             {
-                animator.SetBool("IsAttack", false);
-            }
-        }
-        else if (isChasingPlayer)
-        {
-            isChasingPlayer = false;
-            isSearchingForPlayer = true;
-            agent.speed = moveSpeed; // Reset speed when stopping the chase
-            agent.SetDestination(lastKnownPlayerPosition);
-        }
-        else if (isSearchingForPlayer)
-        {
-            if (Vector3.Distance(transform.position, lastKnownPlayerPosition) < 1f)
-            {
-                isSearchingForPlayer = false;
-                animator.SetBool("isRunning", false); // Stop running after search
                 Patrol();
             }
-            else
+
+            animator.SetBool("isIdle", agent.velocity.magnitude < 0.01f);
+            if (agent.velocity.magnitude > 0.01f && !canSeePlayerFromBehind)
             {
-                // Keep running if still searching
-                animator.SetBool("isRunning", true);
+                transform.rotation = Quaternion.LookRotation(agent.velocity.normalized);
             }
-        }
-        else
-        {
-            Patrol();
-        }
 
-        animator.SetBool("isIdle", agent.velocity.magnitude < 0.01f);
-        if (agent.velocity.magnitude > 0.01f && !canSeePlayerFromBehind)
-        {
-            transform.rotation = Quaternion.LookRotation(agent.velocity.normalized);
-        }
-
-        // Handle audio based on the enemy state
-        HandleAudioPlayback();
+            // Handle audio based on the enemy state
+            HandleAudioPlayback();
+        
     }
 
     void InitializeMicrophone()
     {
-        microphoneInput = Microphone.Start(null, true, 1, 44100);
+        int sampleRate = 44100; // Standard sampling rate
+        int recordingLength = 10; // Length of the recording in seconds
+        microphoneInput = Microphone.Start(null, true, recordingLength, sampleRate);
         isMicrophoneInitialized = true;
     }
 
-    float GetAveragedVolume()
+
+    public float GetAveragedVolume(int clipPosition, AudioClip clip)
     {
-        float[] data = new float[256];
-        float a = 0;
-        microphoneInput.GetData(data, 0);
-        foreach (float s in data)
-        {
-            a += Mathf.Abs(s);
+        int startPosition = clipPosition - sampleWindow;
+
+        if (startPosition < 0) return 0;
+
+        float[] waveData = new float[sampleWindow];
+
+        clip.GetData(waveData, startPosition);
+
+        float totalLoudness = 0;
+        foreach (var sample in waveData) {
+            totalLoudness += Mathf.Abs(sample);
         }
-        return a / 256;
+
+        return totalLoudness / sampleWindow;
     }
-    void InitializeThresholdIndicator()
-    {
-        if (volumeSlider != null && thresholdIndicator != null)
-        {
-            // Adjust the position of the threshold indicator based on the slider's dimensions
-            float normalizedPosition = loudnessThreshold / volumeSlider.maxValue;
-            thresholdIndicator.anchoredPosition = new Vector2(normalizedPosition * volumeSlider.GetComponent<RectTransform>().sizeDelta.x, 0);
-        }
-    }
+
+
     void HandleAudioPlayback()
     {
         // Walking audio
