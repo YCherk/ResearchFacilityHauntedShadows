@@ -18,7 +18,7 @@ public class EnemyAI : MonoBehaviour
     public AudioSource walkingAudioSource;
     public AudioSource runningAudioSource;
     public AudioSource attackAudioSource;
-
+   
 
     private float timer;
     private NavMeshAgent agent;
@@ -139,6 +139,7 @@ public class EnemyAI : MonoBehaviour
         }
     }
 
+   
 
     bool IsIdle()
     {
