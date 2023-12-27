@@ -1,6 +1,7 @@
 using JetBrains.Annotations;
 using UnityEngine;
 using UnityEngine.AI;
+using System.Collections;
 using UnityEngine.UI;
 public class EnemyAI : MonoBehaviour
 {
@@ -15,10 +16,21 @@ public class EnemyAI : MonoBehaviour
     public float fieldOfView = 60.0f;
     public float backFieldOfView = 90.0f;
 
+
+    public Text warningText; // UI Text for displaying the warning
+    public CanvasGroup warningTextCanvasGroup; // CanvasGroup for the warning text
+    public float fadeDuration = 0.5f;
+
     // Audio sources for different states
     public AudioSource walkingAudioSource;
     public AudioSource runningAudioSource;
     public AudioSource attackAudioSource;
+
+    public AudioClip[] audioClips; // Array of audio clips
+    private int playCount = 0; // Counter for tracking the number of times the threshold is exceeded
+    private int nextPlayCount = 1; // The count at which the audio clip will be played next
+    public float audioPlayChance = 0.5f; // Chance of playing an audio clip (0.5 for 50%)
+    private bool isAudioPlaying = false; // To track if an audio clip is currently playing
 
     // Microphone input and UI variables
     public float sensitivity = 100;
@@ -63,8 +75,17 @@ public class EnemyAI : MonoBehaviour
 
             if (micLoudness > loudnessThreshold)
             {
+                StartCoroutine(DisplayWarning());
                 TurnTowardsPlayer(); // Continuously turn towards the player during the chase
                 agent.speed = chaseSpeed; // Increase speed when starting to chase
+
+                playCount++;
+
+                if (playCount >= nextPlayCount && Random.value < audioPlayChance)
+                {
+                    PlayRandomAudioClip();
+                    nextPlayCount = playCount + Random.Range(1, 5); // Randomize the next play count
+                }
 
                 isChasingPlayer = true;
                 isSearchingForPlayer = false;
@@ -140,6 +161,55 @@ public class EnemyAI : MonoBehaviour
         
     }
 
+    void PlayRandomAudioClip()
+    {
+        if (audioClips.Length > 0 && !isAudioPlaying)
+        {
+            int clipIndex = Random.Range(0, audioClips.Length);
+            AudioClip clipToPlay = audioClips[clipIndex];
+            AudioSource.PlayClipAtPoint(clipToPlay, transform.position); // Play the clip at the enemy's position
+            isAudioPlaying = true;
+
+            // Wait for the length of the clip before allowing another clip to be played
+            StartCoroutine(ResetAudioPlayingFlag(clipToPlay.length));
+        }
+    }
+
+    IEnumerator ResetAudioPlayingFlag(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        isAudioPlaying = false;
+    }
+
+    IEnumerator DisplayWarning()
+    {
+        warningText.text = "You Screamed. Run."; // Set the text
+        warningText.gameObject.SetActive(true); // Show warning text
+
+        // Fade in
+        float elapsedTime = 0;
+        while (elapsedTime < fadeDuration)
+        {
+            warningTextCanvasGroup.alpha = elapsedTime / fadeDuration;
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        warningTextCanvasGroup.alpha = 1;
+
+        yield return new WaitForSeconds(2); // Wait for 2 seconds
+
+        // Fade out
+        elapsedTime = 0;
+        while (elapsedTime < fadeDuration)
+        {
+            warningTextCanvasGroup.alpha = 1 - (elapsedTime / fadeDuration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+        warningTextCanvasGroup.alpha = 0;
+
+        warningText.gameObject.SetActive(false); // Hide warning text
+    }
     void InitializeMicrophone()
     {
         int sampleRate = 44100; // Standard sampling rate
