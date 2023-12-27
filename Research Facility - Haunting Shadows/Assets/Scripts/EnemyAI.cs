@@ -21,6 +21,16 @@ public class EnemyAI : MonoBehaviour
     public CanvasGroup warningTextCanvasGroup; // CanvasGroup for the warning text
     public float fadeDuration = 0.5f;
 
+    public GameObject jumpscareCanvas; // Assign in the Inspector
+    private float chaseDuration = 0f;
+    private bool isJumpscareTriggered = false;
+    public AudioSource jumpScare;
+    public CanvasGroup jumpscareCanvasGroup;
+    public float jumpscareChance = 0.3f; // 30% chance to trigger jumpscare
+    private Coroutine jumpscareCoroutine = null;
+
+
+
     // Audio sources for different states
     public AudioSource walkingAudioSource;
     public AudioSource runningAudioSource;
@@ -103,35 +113,47 @@ public class EnemyAI : MonoBehaviour
                 }
             }
         }
+        
+        else
+        {
+            chaseDuration = 0f;
+        }
 
-            if (canSeePlayer || canSeePlayerFromBehind)
+        if (canSeePlayer || canSeePlayerFromBehind)
+        {
+            TurnTowardsPlayer(); // Continuously turn towards the player during the chase
+            agent.speed = chaseSpeed; // Increase speed when starting to chase
+
+            isChasingPlayer = true;
+            isSearchingForPlayer = false;
+            lastKnownPlayerPosition = player.position;
+            agent.SetDestination(player.position);
+            animator.SetBool("isRunning", true);
+
+            chaseDuration += Time.deltaTime;
+
+            if (chaseDuration > 10f && !isJumpscareTriggered && Random.value < jumpscareChance)
             {
-                TurnTowardsPlayer(); // Continuously turn towards the player during the chase
-                agent.speed = chaseSpeed; // Increase speed when starting to chase
-
-                isChasingPlayer = true;
-                isSearchingForPlayer = false;
-                lastKnownPlayerPosition = player.position;
-                agent.SetDestination(player.position);
-                animator.SetBool("isRunning", true);
-
-                if (distanceToPlayer <= attackDistance)
-                {
-                    animator.SetTrigger("IsAttack");
-                }
-                else
-                {
-                    animator.SetBool("IsAttack", false);
-                }
+                isJumpscareTriggered = true; // Set this flag as soon as you decide to trigger the jumpscare
+                jumpscareCoroutine = StartCoroutine(TriggerJumpscare());
             }
-            else if (isChasingPlayer)
+        }
+        else if (isChasingPlayer)
+        {
+            // Reset logic when the enemy loses sight of the player
+            isChasingPlayer = false;
+            isSearchingForPlayer = true;
+            chaseDuration = 0f;
+            isJumpscareTriggered = false; // Ensure this is reset here
+            if (jumpscareCoroutine != null)
             {
-                isChasingPlayer = false;
-                isSearchingForPlayer = true;
-                agent.speed = moveSpeed; // Reset speed when stopping the chase
-                agent.SetDestination(lastKnownPlayerPosition);
+                StopCoroutine(jumpscareCoroutine);
+                jumpscareCoroutine = null;
             }
-            else if (isSearchingForPlayer)
+            agent.speed = moveSpeed; // Reset speed when stopping the chase
+            agent.SetDestination(lastKnownPlayerPosition);
+        }
+        else if (isSearchingForPlayer)
             {
                 if (Vector3.Distance(transform.position, lastKnownPlayerPosition) < 1f)
                 {
@@ -159,6 +181,35 @@ public class EnemyAI : MonoBehaviour
             // Handle audio based on the enemy state
             HandleAudioPlayback();
         
+    }
+    IEnumerator TriggerJumpscare()
+    {
+        isJumpscareTriggered = true;
+        jumpScare.Play();
+        jumpscareCanvas.SetActive(true);
+
+        // Flash Effect
+        float flashDuration = 0.1f; // Duration of each flash
+        int numberOfFlashes = 3; // Total number of flashes
+
+        for (int i = 0; i < numberOfFlashes; i++)
+        {
+            // Flash on
+            jumpscareCanvasGroup.alpha = 1;
+            yield return new WaitForSeconds(flashDuration);
+
+            // Flash off
+            jumpscareCanvasGroup.alpha = 0;
+            yield return new WaitForSeconds(flashDuration);
+        }
+
+        // Show final jumpscare image for a brief moment
+        jumpscareCanvasGroup.alpha = 1;
+
+        jumpscareCanvas.SetActive(false);
+        yield return new WaitForSeconds(1f);
+
+        jumpscareCoroutine = null;
     }
 
     void PlayRandomAudioClip()
