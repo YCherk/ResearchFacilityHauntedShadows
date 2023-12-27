@@ -132,7 +132,7 @@ public class EnemyAI : MonoBehaviour
 
             chaseDuration += Time.deltaTime;
 
-            if (chaseDuration > 10f && !isJumpscareTriggered && Random.value < jumpscareChance)
+            if (chaseDuration > 15f && !isJumpscareTriggered && Random.value < jumpscareChance)
             {
                 isJumpscareTriggered = true; // Set this flag as soon as you decide to trigger the jumpscare
                 jumpscareCoroutine = StartCoroutine(TriggerJumpscare());
