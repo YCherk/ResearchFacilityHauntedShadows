@@ -105,7 +105,7 @@ public class EnemyAI : MonoBehaviour
 
                 if (distanceToPlayer <= attackDistance)
                 {
-                    animator.SetTrigger("IsAttack");
+                    animator.SetBool("IsAttack", true);
                 }
                 else
                 {
@@ -136,6 +136,15 @@ public class EnemyAI : MonoBehaviour
             {
                 isJumpscareTriggered = true; // Set this flag as soon as you decide to trigger the jumpscare
                 jumpscareCoroutine = StartCoroutine(TriggerJumpscare());
+            }
+
+            if (distanceToPlayer <= attackDistance)
+            {
+                animator.SetBool("IsAttack", true);
+            }
+            else
+            {
+                animator.SetBool("IsAttack", false);
             }
         }
         else if (isChasingPlayer)
