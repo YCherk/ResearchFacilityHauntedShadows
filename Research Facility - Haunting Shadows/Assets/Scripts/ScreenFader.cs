@@ -7,7 +7,7 @@ public class ScreenFader : MonoBehaviour
 {
     public float fadeDuration = 2f;
     private Image fadePanel;
-    private bool isFading = false;
+    public bool isFading = false;
 
     void Start()
     {

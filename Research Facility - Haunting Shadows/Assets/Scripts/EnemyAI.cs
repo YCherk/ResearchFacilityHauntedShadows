@@ -118,12 +118,13 @@ public class EnemyAI : MonoBehaviour
             if (distanceToPlayer <= attackDistance)
             {
                 animator.SetBool("IsAttack", true);
-
+                PlayRandomAudioClip();
 
             }
             else
             {
                 animator.SetBool("IsAttack", false);
+               
             }
         }
 
@@ -350,14 +351,6 @@ public class EnemyAI : MonoBehaviour
     bool IsWalking()
     {
         return !isChasingPlayer && !isSearchingForPlayer && agent.velocity.magnitude > 0.01f;
-    }
-
-    public void PlayAttackSound()
-    {
-        if (attackAudioSource != null && !attackAudioSource.isPlaying)
-        {
-            attackAudioSource.Play();
-        }
     }
 
    
