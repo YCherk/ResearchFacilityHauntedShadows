@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
 using UnityEngine.UI;
+
 public class EnemyAI : MonoBehaviour
 {
     public float patrolRadius = 10.0f;
@@ -16,40 +17,32 @@ public class EnemyAI : MonoBehaviour
     public float fieldOfView = 60.0f;
     public float backFieldOfView = 90.0f;
 
-
-    public Text warningText; // UI Text for displaying the warning
-    public CanvasGroup warningTextCanvasGroup; // CanvasGroup for the warning text
+    public Text warningText;
+    public CanvasGroup warningTextCanvasGroup;
     public float fadeDuration = 0.5f;
 
-    public GameObject jumpscareCanvas; // Assign in the Inspector
+    public GameObject jumpscareCanvas;
     private float chaseDuration = 0f;
     private bool isJumpscareTriggered = false;
     public AudioSource jumpScare;
     public CanvasGroup jumpscareCanvasGroup;
-    public float jumpscareChance = 0.3f; // 30% chance to trigger jumpscare
+    public float jumpscareChance = 0.3f;
     private Coroutine jumpscareCoroutine = null;
 
-
-
-    // Audio sources for different states
     public AudioSource walkingAudioSource;
     public AudioSource runningAudioSource;
     public AudioSource attackAudioSource;
 
-    public AudioClip[] audioClips; // Array of audio clips
-    private int playCount = 0; // Counter for tracking the number of times the threshold is exceeded
-    private int nextPlayCount = 1; // The count at which the audio clip will be played next
-    public float audioPlayChance = 0.5f; // Chance of playing an audio clip (0.5 for 50%)
-    private bool isAudioPlaying = false; // To track if an audio clip is currently playing
+    public AudioClip[] audioClips;
+    public float audioPlayChance = 0.5f;
+    private bool isAudioPlaying = false;
 
-    // Microphone input and UI variables
     public float sensitivity = 100;
     public float loudnessThreshold = 10;
-    public Slider volumeSlider; // Assign this in the Inspector
+    public Slider volumeSlider;
     private AudioClip microphoneInput;
     private bool isMicrophoneInitialized = false;
     public int sampleWindow = 64;
-
 
     private float timer;
     private NavMeshAgent agent;
@@ -58,15 +51,18 @@ public class EnemyAI : MonoBehaviour
     private bool isSearchingForPlayer = false;
     private Vector3 lastKnownPlayerPosition;
 
+    public float minFlickerDuration = 0.1f;
+    public float maxFlickerDuration = 0.5f;
+    private Coroutine flickerCoroutine = null;
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
         timer = patrolTimer;
-        agent.speed = moveSpeed; // Set initial speed to patrol speed
-        agent.updateRotation = false;
+        agent.speed = moveSpeed;
+        agent.updateRotation = true;
         InitializeMicrophone();
-      
     }
 
     void Update()
@@ -74,10 +70,14 @@ public class EnemyAI : MonoBehaviour
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         bool canSeePlayer = CanSeePlayer(distanceToPlayer);
         bool canSeePlayerFromBehind = CanSeePlayerFromBehind(distanceToPlayer);
+        animator.SetBool("WalkForward", true);
+        animator.SetBool("isRunning", false);
+        animator.SetBool("IsAttack", false);
+        animator.SetBool("isIdle", false);
 
         if (isMicrophoneInitialized)
         {
-            int micPosition = Microphone.GetPosition(null) - sampleWindow; // Get current position of the mic recording
+            int micPosition = Microphone.GetPosition(null) - sampleWindow;
             if (micPosition < 0) return;
 
             float micLoudness = GetAveragedVolume(micPosition, microphoneInput) * sensitivity;
@@ -86,49 +86,26 @@ public class EnemyAI : MonoBehaviour
             if (micLoudness > loudnessThreshold)
             {
                 StartCoroutine(DisplayWarning());
-                TurnTowardsPlayer(); // Continuously turn towards the player during the chase
-                agent.speed = chaseSpeed; // Increase speed when starting to chase
-
-                playCount++;
-
-                if (playCount >= nextPlayCount && Random.value < audioPlayChance)
-                {
-                    PlayRandomAudioClip();
-                    nextPlayCount = playCount + Random.Range(1, 5); // Randomize the next play count
-                }
-
+                TurnTowardsPlayer();
                 isChasingPlayer = true;
                 isSearchingForPlayer = false;
                 lastKnownPlayerPosition = player.position;
                 agent.SetDestination(player.position);
                 animator.SetBool("isRunning", true);
-
-                if (distanceToPlayer <= attackDistance)
-                {
-                    animator.SetBool("IsAttack", true);
-                }
-                else
-                {
-                    animator.SetBool("IsAttack", false);
-                }
+                ManageFlickering();
+                PlayRandomAudioClip();
             }
-        }
-        
-        else
-        {
-            chaseDuration = 0f;
         }
 
         if (canSeePlayer || canSeePlayerFromBehind)
         {
-            TurnTowardsPlayer(); // Continuously turn towards the player during the chase
-            agent.speed = chaseSpeed; // Increase speed when starting to chase
-
+            TurnTowardsPlayer();
             isChasingPlayer = true;
             isSearchingForPlayer = false;
             lastKnownPlayerPosition = player.position;
             agent.SetDestination(player.position);
             animator.SetBool("isRunning", true);
+            ManageFlickering();
 
             chaseDuration += Time.deltaTime;
 
@@ -141,55 +118,100 @@ public class EnemyAI : MonoBehaviour
             if (distanceToPlayer <= attackDistance)
             {
                 animator.SetBool("IsAttack", true);
+
+
             }
             else
             {
                 animator.SetBool("IsAttack", false);
             }
         }
+
         else if (isChasingPlayer)
         {
-            // Reset logic when the enemy loses sight of the player
             isChasingPlayer = false;
             isSearchingForPlayer = true;
             chaseDuration = 0f;
-            isJumpscareTriggered = false; // Ensure this is reset here
+            isJumpscareTriggered = false;
             if (jumpscareCoroutine != null)
             {
                 StopCoroutine(jumpscareCoroutine);
                 jumpscareCoroutine = null;
             }
-            agent.speed = moveSpeed; // Reset speed when stopping the chase
+            agent.speed = moveSpeed;
             agent.SetDestination(lastKnownPlayerPosition);
+            StopFlickering();
         }
         else if (isSearchingForPlayer)
+        {
+            if (Vector3.Distance(transform.position, lastKnownPlayerPosition) < 1f)
             {
-                if (Vector3.Distance(transform.position, lastKnownPlayerPosition) < 1f)
-                {
-                    isSearchingForPlayer = false;
-                    animator.SetBool("isRunning", false); // Stop running after search
-                    Patrol();
-                }
-                else
-                {
-                    // Keep running if still searching
-                    animator.SetBool("isRunning", true);
-                }
+                isSearchingForPlayer = false;
+                animator.SetBool("isIdle", true);
+                Patrol();
             }
             else
             {
-                Patrol();
+                animator.SetBool("isRunning", true);
             }
+        }
+        else
+        {
+            Patrol();
+            animator.SetBool("WalkForward", true);
+        }
 
-            animator.SetBool("isIdle", agent.velocity.magnitude < 0.01f);
-            if (agent.velocity.magnitude > 0.01f && !canSeePlayerFromBehind)
-            {
-                transform.rotation = Quaternion.LookRotation(agent.velocity.normalized);
-            }
+        HandleAudioPlayback();
+    }
 
-            // Handle audio based on the enemy state
-            HandleAudioPlayback();
-        
+    private void ManageFlickering()
+    {
+        if (flickerCoroutine == null)
+        {
+            flickerCoroutine = StartCoroutine(Flicker());
+        }
+    }
+
+    private void StopFlickering()
+    {
+        if (flickerCoroutine != null)
+        {
+            StopCoroutine(flickerCoroutine);
+            flickerCoroutine = null;
+            SetEnemyVisibility(true);
+        }
+    }
+
+    IEnumerator Flicker()
+    {
+        while (true)
+        {
+            float flickerTime = Random.Range(minFlickerDuration, maxFlickerDuration);
+
+            SetEnemyVisibility(!IsEnemyVisible());
+            agent.speed = IsEnemyVisible() ? chaseSpeed : chaseSpeed * 2;
+
+            yield return new WaitForSeconds(flickerTime);
+        }
+    }
+
+    private void SetEnemyVisibility(bool isVisible)
+    {
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        foreach (var renderer in renderers)
+        {
+            renderer.enabled = isVisible;
+        }
+    }
+
+    private bool IsEnemyVisible()
+    {
+        Renderer[] renderers = GetComponentsInChildren<Renderer>();
+        if (renderers.Length > 0)
+        {
+            return renderers[0].enabled;
+        }
+        return true;
     }
     IEnumerator TriggerJumpscare()
     {
@@ -425,7 +447,10 @@ public class EnemyAI : MonoBehaviour
 
     private void TurnTowardsPlayer()
     {
+        if (!isChasingPlayer) return; // Only turn towards player if chasing
+
         Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        transform.rotation = Quaternion.LookRotation(directionToPlayer);
+        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToPlayer.x, 0, directionToPlayer.z));
+        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
     }
 }

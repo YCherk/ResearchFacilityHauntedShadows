@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/Scenes/Start.unity
     guid: 7769f33fb4fa2e5458344a36556ad760
   - enabled: 1
+    path: Assets/Scenes/GameCompleted.unity
+    guid: a38119789a7b6054db1c14e10f1b38fd
+  - enabled: 1
     path: Assets/Scenes/Game Over.unity
     guid: 43fe7454c2ca07c4bbf90076675e3088
   m_configObjects: {}
