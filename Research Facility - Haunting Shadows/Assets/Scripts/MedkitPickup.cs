@@ -1,11 +1,12 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Collections;
 
 public class MedkitPickup : MonoBehaviour
 {
     public Text pickupPrompt; // Reference to the UI Text for the pickup prompt
     private bool isPlayerInRange = false; // Tracks if the player is in range of the medkit
-
+    public Text medkitcollectText;
     private void Start()
     {
         if (pickupPrompt != null)
@@ -22,12 +23,21 @@ public class MedkitPickup : MonoBehaviour
             if (playerHealth != null)
             {
                 playerHealth.Heal(playerHealth.maxHealth); // Fully heal the player
-                ClearPickupPrompt(); // Clear the pickup prompt
+                StartCoroutine(DisplayDialogue("Medkit Collected", 2));
                 Destroy(gameObject); // Destroy the medkit
+                
             }
         }
     }
+    private IEnumerator DisplayDialogue(string message, float duration)
+    {
+        medkitcollectText.text = message;
+        medkitcollectText.gameObject.SetActive(true);
 
+        yield return new WaitForSeconds(duration);
+
+        medkitcollectText.gameObject.SetActive(false);
+    }
 
     private void OnTriggerEnter(Collider other)
     {

@@ -43,6 +43,7 @@ public class EnemyAI : MonoBehaviour
     private AudioClip microphoneInput;
     private bool isMicrophoneInitialized = false;
     public int sampleWindow = 64;
+    public Text dialogueScreamText;
 
     private float timer;
     private NavMeshAgent agent;
@@ -54,6 +55,8 @@ public class EnemyAI : MonoBehaviour
     public float minFlickerDuration = 0.1f;
     public float maxFlickerDuration = 0.5f;
     private Coroutine flickerCoroutine = null;
+    private bool dialoguePlayedForSpotting = false;
+    private bool dialoguePlayedForScream = false;
 
     void Start()
     {
@@ -94,6 +97,14 @@ public class EnemyAI : MonoBehaviour
                 animator.SetBool("isRunning", true);
                 ManageFlickering();
                 PlayRandomAudioClip();
+
+                if (micLoudness > loudnessThreshold && dialoguePlayedForScream == false)
+                {
+                    StartCoroutine(DisplayDialogue("Oh Shit.", 2)); // Display for 1 second
+                    dialoguePlayedForScream = true;
+                }
+
+
             }
         }
 
@@ -106,6 +117,12 @@ public class EnemyAI : MonoBehaviour
             agent.SetDestination(player.position);
             animator.SetBool("isRunning", true);
             ManageFlickering();
+
+            if ((canSeePlayer || canSeePlayerFromBehind) && dialoguePlayedForSpotting == false)
+            {
+                StartCoroutine(DisplayDialogue("Fuck he saw me, I need to hide", 1)); // Display for 1 second
+                dialoguePlayedForSpotting = true;
+            }
 
             chaseDuration += Time.deltaTime;
 
@@ -134,6 +151,8 @@ public class EnemyAI : MonoBehaviour
             isSearchingForPlayer = true;
             chaseDuration = 0f;
             isJumpscareTriggered = false;
+            
+
             if (jumpscareCoroutine != null)
             {
                 StopCoroutine(jumpscareCoroutine);
@@ -150,6 +169,8 @@ public class EnemyAI : MonoBehaviour
                 isSearchingForPlayer = false;
                 animator.SetBool("isIdle", true);
                 Patrol();
+                dialoguePlayedForSpotting = false;
+                dialoguePlayedForScream = false;
             }
             else
             {
@@ -164,7 +185,15 @@ public class EnemyAI : MonoBehaviour
 
         HandleAudioPlayback();
     }
+    private IEnumerator DisplayDialogue(string message, float duration)
+    {
+        dialogueScreamText.text = message;
+        dialogueScreamText.gameObject.SetActive(true);
 
+        yield return new WaitForSeconds(duration);
+
+        dialogueScreamText.gameObject.SetActive(false);
+    }
     private void ManageFlickering()
     {
         if (flickerCoroutine == null)

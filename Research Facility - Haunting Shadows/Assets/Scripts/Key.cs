@@ -4,6 +4,7 @@ using UnityEngine.UI;
 public class Key : MonoBehaviour
 {
     public Text pickupPrompt; // Reference to the UI Text for the pickup prompt
+    private bool playerInRange = false; // Flag to check if the player is in range
 
     private void Start()
     {
@@ -13,20 +14,10 @@ public class Key : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter(Collider other)
+    private void Update()
     {
-        if (other.CompareTag("Player"))
-        {
-            if (pickupPrompt != null)
-            {
-                pickupPrompt.text = "Press [E] to collect"; // Show the prompt
-            }
-        }
-    }
-
-    private void OnTriggerStay(Collider other)
-    {
-        if (other.CompareTag("Player") && Input.GetKeyDown(KeyCode.E))
+        // Check if the player is in range and the E key is pressed
+        if (playerInRange && Input.GetKeyDown(KeyCode.E))
         {
             KeyManager.Instance.AddKey();
             if (pickupPrompt != null)
@@ -37,10 +28,23 @@ public class Key : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            playerInRange = true; // Set flag to true
+            if (pickupPrompt != null)
+            {
+                pickupPrompt.text = "Press [E] to collect"; // Show the prompt
+            }
+        }
+    }
+
     private void OnTriggerExit(Collider other)
     {
         if (other.CompareTag("Player"))
         {
+            playerInRange = false; // Set flag to false
             if (pickupPrompt != null)
             {
                 pickupPrompt.text = ""; // Hide the prompt
