@@ -44,11 +44,6 @@ public class KeyManager : MonoBehaviour
         keysCollectedText.gameObject.SetActive(true);
         StartCoroutine(HideTextAfterDelay(keysCollectedText));
 
-        if (keysCollected >= totalKeys)
-        {
-            // Logic for all keys collected
-            Debug.Log("All keys collected! You can now open the door.");
-        }
     }
 
     private IEnumerator HideTextAfterDelay(Text textElement)
