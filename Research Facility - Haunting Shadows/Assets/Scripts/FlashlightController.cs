@@ -13,6 +13,7 @@ public class FlashlightController : MonoBehaviour
     private float flashlightDuration = 30f;
     private float messageTimer = 0; // Separate timer for message display
     private bool showMessage = false;
+    public AudioSource flashlightSound;
 
     void Start()
     {
@@ -26,6 +27,7 @@ public class FlashlightController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.F) && canUseFlashlight)
         {
             ToggleFlashlight();
+            flashlightSound.Play();
         }
 
         if (isFlashlightOn)

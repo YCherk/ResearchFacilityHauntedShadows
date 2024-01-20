@@ -537,7 +537,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: You Escaped for now, We always come back
+  m_text: You may have escaped, but you will forever be trapped in your own mind.
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 05504ef149aa02443b74ab490502fd42, type: 2}
   m_sharedMaterial: {fileID: -4531672758321288468, guid: 05504ef149aa02443b74ab490502fd42, type: 2}

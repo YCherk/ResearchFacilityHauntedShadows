@@ -185,6 +185,15 @@ public class EnemyAI : MonoBehaviour
 
         HandleAudioPlayback();
     }
+    public void SetDifficultyParameters(float newChaseSpeed, float newSightDistance, float newAttackDistance, float newFieldOfView, float newSensitivity, float newLoudnessThreshold)
+    {
+        chaseSpeed = newChaseSpeed;
+        sightDistance = newSightDistance;
+        attackDistance = newAttackDistance;
+        fieldOfView = newFieldOfView;
+        sensitivity = newSensitivity;
+        loudnessThreshold = newLoudnessThreshold;
+    }
     private IEnumerator DisplayDialogue(string message, float duration)
     {
         dialogueScreamText.text = message;
