@@ -6,6 +6,12 @@ using UnityEngine.UI;
 
 public class EnemyAI : MonoBehaviour
 {
+    public float timeToOpenDoor = 10f; // Time the enemy will wait before opening the door
+    private float doorTimer = 0f; // Timer to track the waiting time
+
+    private float timeSinceLastSeen = 0f; // Time since the player was last seen
+    public float timeToGiveUpChase = 5f; // Time after which enemy gives up the chase
+
     public float patrolRadius = 10.0f;
     public float patrolTimer = 5.0f;
     public float moveSpeed = 2.0f;
@@ -32,6 +38,7 @@ public class EnemyAI : MonoBehaviour
     public AudioSource walkingAudioSource;
     public AudioSource runningAudioSource;
     public AudioSource attackAudioSource;
+    public AudioSource knockOnDoor;
 
     public AudioClip[] audioClips;
     public float audioPlayChance = 0.5f;
@@ -73,6 +80,7 @@ public class EnemyAI : MonoBehaviour
         float distanceToPlayer = Vector3.Distance(transform.position, player.position);
         bool canSeePlayer = CanSeePlayer(distanceToPlayer);
         bool canSeePlayerFromBehind = CanSeePlayerFromBehind(distanceToPlayer);
+
         animator.SetBool("WalkForward", true);
         animator.SetBool("isRunning", false);
         animator.SetBool("IsAttack", false);
@@ -98,13 +106,11 @@ public class EnemyAI : MonoBehaviour
                 ManageFlickering();
                 PlayRandomAudioClip();
 
-                if (micLoudness > loudnessThreshold && dialoguePlayedForScream == false)
+                if (!dialoguePlayedForScream)
                 {
-                    StartCoroutine(DisplayDialogue("Oh Shit.", 2)); // Display for 1 second
+                    StartCoroutine(DisplayDialogue("Oh Shit.", 2));
                     dialoguePlayedForScream = true;
                 }
-
-
             }
         }
 
@@ -118,9 +124,9 @@ public class EnemyAI : MonoBehaviour
             animator.SetBool("isRunning", true);
             ManageFlickering();
 
-            if ((canSeePlayer || canSeePlayerFromBehind) && dialoguePlayedForSpotting == false)
+            if (!dialoguePlayedForSpotting)
             {
-                StartCoroutine(DisplayDialogue("Fuck he saw me, I need to hide", 2)); // Display for 1 second
+                StartCoroutine(DisplayDialogue("Fuck he saw me, I need to hide", 2));
                 dialoguePlayedForSpotting = true;
             }
 
@@ -128,7 +134,7 @@ public class EnemyAI : MonoBehaviour
 
             if (chaseDuration > 15f && !isJumpscareTriggered && Random.value < jumpscareChance)
             {
-                isJumpscareTriggered = true; // Set this flag as soon as you decide to trigger the jumpscare
+                isJumpscareTriggered = true;
                 jumpscareCoroutine = StartCoroutine(TriggerJumpscare());
             }
 
@@ -136,41 +142,38 @@ public class EnemyAI : MonoBehaviour
             {
                 animator.SetBool("IsAttack", true);
                 PlayRandomAudioClip();
-
             }
             else
             {
                 animator.SetBool("IsAttack", false);
-               
             }
         }
-
         else if (isChasingPlayer)
         {
-            isChasingPlayer = false;
-            isSearchingForPlayer = true;
-            chaseDuration = 0f;
-            isJumpscareTriggered = false;
-            
-
-            if (jumpscareCoroutine != null)
+            // If LOS is broken, switch to searching
+            timeSinceLastSeen += Time.deltaTime;
+            if (timeSinceLastSeen > timeToGiveUpChase)
             {
-                StopCoroutine(jumpscareCoroutine);
-                jumpscareCoroutine = null;
+                isChasingPlayer = false;
+                isSearchingForPlayer = true;
+                StopFlickering();
+                lastKnownPlayerPosition = player.position;
+                agent.SetDestination(lastKnownPlayerPosition);
             }
-            agent.speed = moveSpeed;
-            agent.SetDestination(lastKnownPlayerPosition);
-            StopFlickering();
         }
         else if (isSearchingForPlayer)
         {
+            doorTimer += Time.deltaTime;
+            if (doorTimer >= timeToOpenDoor)
+            {
+                CheckAndOpenDoor();
+                doorTimer = 0f; // Reset the timer
+            }
+
             if (Vector3.Distance(transform.position, lastKnownPlayerPosition) < 1f)
             {
                 isSearchingForPlayer = false;
-                animator.SetBool("isIdle", true);
-                Patrol();
-                dialoguePlayedForSpotting = false;
-                dialoguePlayedForScream = false;
+                Patrol(); // Resume patrol after reaching last known position
             }
             else
             {
@@ -179,11 +182,28 @@ public class EnemyAI : MonoBehaviour
         }
         else
         {
+            // Resume patrol if not chasing or searching
             Patrol();
-            animator.SetBool("WalkForward", true);
         }
 
         HandleAudioPlayback();
+    }
+
+    private void CheckAndOpenDoor()
+    {
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, 2f); // Check within 2 meters
+        foreach (var hitCollider in hitColliders)
+        {
+            if (hitCollider.CompareTag("Door")) // Ensure your door has the tag "Door"
+            {
+                knockOnDoor.Play();
+                DoorController door = hitCollider.GetComponent<DoorController>();
+                if (door != null)
+                {
+                    door.ForceOpenDoor(); // Force the door open
+                }
+            }
+        }
     }
     public void SetDifficultyParameters(float newChaseSpeed, float newSightDistance, float newAttackDistance, float newFieldOfView, float newSensitivity, float newLoudnessThreshold)
     {
@@ -304,7 +324,7 @@ public class EnemyAI : MonoBehaviour
 
     IEnumerator DisplayWarning()
     {
-        warningText.text = "He is coming"; // Set the text
+        warningText.text = "It heard you"; // Set the text
         warningText.gameObject.SetActive(true); // Show warning text
 
         // Fade in
@@ -417,6 +437,7 @@ public class EnemyAI : MonoBehaviour
                 RaycastHit hit;
                 if (Physics.Raycast(transform.position, directionToPlayer, out hit, sightDistance))
                 {
+                    // Check if the raycast directly hits the player
                     return hit.transform == player;
                 }
             }
