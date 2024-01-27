@@ -120,7 +120,7 @@ public class EnemyAI : MonoBehaviour
 
             if ((canSeePlayer || canSeePlayerFromBehind) && dialoguePlayedForSpotting == false)
             {
-                StartCoroutine(DisplayDialogue("Fuck he saw me, I need to hide", 1)); // Display for 1 second
+                StartCoroutine(DisplayDialogue("Fuck he saw me, I need to hide", 2)); // Display for 1 second
                 dialoguePlayedForSpotting = true;
             }
 
