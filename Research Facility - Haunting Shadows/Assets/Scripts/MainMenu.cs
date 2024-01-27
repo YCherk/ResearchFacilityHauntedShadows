@@ -6,7 +6,7 @@ public class MainMenu : MonoBehaviour
     public void PlayGame()
     {
         // Load the 'Start' scene
-        SceneManager.LoadScene("Start");
+        SceneManager.LoadScene("IntroScene");
     }
 
     public void OpenOptions()
