@@ -304,7 +304,7 @@ public class EnemyAI : MonoBehaviour
 
     IEnumerator DisplayWarning()
     {
-        warningText.text = "You Screamed. Run."; // Set the text
+        warningText.text = "He is coming"; // Set the text
         warningText.gameObject.SetActive(true); // Show warning text
 
         // Fade in
