@@ -3,14 +3,21 @@ using UnityEngine.UI;
 
 public class Key : MonoBehaviour
 {
-    public Text pickupPrompt; // Reference to the UI Text for the pickup prompt
+    private Text pickupPrompt; // Reference to the UI Text for the pickup prompt
     private bool playerInRange = false; // Flag to check if the player is in range
 
     private void Start()
     {
+        // Find the UI Text component in the scene
+        pickupPrompt = GameObject.Find("KeyPrompt").GetComponent<Text>();
+
         if (pickupPrompt != null)
         {
             pickupPrompt.text = ""; // Initially hide the prompt
+        }
+        else
+        {
+            Debug.LogError("Pickup prompt UI Text not found in the scene.");
         }
     }
 
