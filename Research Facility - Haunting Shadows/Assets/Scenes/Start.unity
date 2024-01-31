@@ -1004,7 +1004,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e4aac8b158811046aa77e7391444496, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sampleWindow: 64
 --- !u!4 &90809995
 Transform:
   m_ObjectHideFlags: 0
@@ -1514,7 +1513,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 67113f2442b072242ae0557ee9827b07, type: 3}
+    m_Font: {fileID: 12800000, guid: 29260805fc9c42f409f095ae5fe6fac6, type: 3}
     m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
@@ -4319,7 +4318,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 67113f2442b072242ae0557ee9827b07, type: 3}
+    m_Font: {fileID: 12800000, guid: 29260805fc9c42f409f095ae5fe6fac6, type: 3}
     m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
@@ -4671,7 +4670,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 67113f2442b072242ae0557ee9827b07, type: 3}
+    m_Font: {fileID: 12800000, guid: 29260805fc9c42f409f095ae5fe6fac6, type: 3}
     m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
@@ -6078,7 +6077,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 67113f2442b072242ae0557ee9827b07, type: 3}
+    m_Font: {fileID: 12800000, guid: 29260805fc9c42f409f095ae5fe6fac6, type: 3}
     m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
@@ -9239,6 +9238,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   collectText: {fileID: 137002097}
+  transcriptText: {fileID: 0}
+  speakPrompt: {fileID: 0}
+  playerVoiceInteraction: {fileID: 0}
 --- !u!224 &1151963923
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10764,7 +10766,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 67113f2442b072242ae0557ee9827b07, type: 3}
+    m_Font: {fileID: 12800000, guid: 29260805fc9c42f409f095ae5fe6fac6, type: 3}
     m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
@@ -12859,8 +12861,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 67113f2442b072242ae0557ee9827b07, type: 3}
-    m_FontSize: 25
+    m_Font: {fileID: 12800000, guid: 29260805fc9c42f409f095ae5fe6fac6, type: 3}
+    m_FontSize: 20
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 1
@@ -12896,8 +12898,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0.5598, y: 71}
-  m_SizeDelta: {x: 667.3097, y: 66.7922}
+  m_AnchoredPosition: {x: 6.8868, y: 88.385}
+  m_SizeDelta: {x: 895.076, y: 138.39}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1001 &1664752563
 PrefabInstance:
@@ -15859,7 +15861,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 67113f2442b072242ae0557ee9827b07, type: 3}
+    m_Font: {fileID: 12800000, guid: 29260805fc9c42f409f095ae5fe6fac6, type: 3}
     m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
@@ -15976,7 +15978,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 67113f2442b072242ae0557ee9827b07, type: 3}
+    m_Font: {fileID: 12800000, guid: 29260805fc9c42f409f095ae5fe6fac6, type: 3}
     m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
@@ -16341,7 +16343,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   m_FontData:
-    m_Font: {fileID: 12800000, guid: 67113f2442b072242ae0557ee9827b07, type: 3}
+    m_Font: {fileID: 12800000, guid: 29260805fc9c42f409f095ae5fe6fac6, type: 3}
     m_FontSize: 25
     m_FontStyle: 0
     m_BestFit: 0
@@ -18981,7 +18983,7 @@ PrefabInstance:
       objectReference: {fileID: 7641856791011886581}
     - target: {fileID: 7068073224048704694, guid: fbb7800f0c359e14b9f79f402e8f74b3, type: 3}
       propertyPath: patrolTimer
-      value: 8
+      value: 80
       objectReference: {fileID: 0}
     - target: {fileID: 7068073224048704694, guid: fbb7800f0c359e14b9f79f402e8f74b3, type: 3}
       propertyPath: sensitivity

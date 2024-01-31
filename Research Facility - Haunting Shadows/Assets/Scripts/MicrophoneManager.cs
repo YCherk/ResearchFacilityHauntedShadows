@@ -10,10 +10,8 @@ public class MicrophoneManager : MonoBehaviour
     private DictationRecognizer dictationRecognizer;
     public Action<string> OnPlayerSpeech;
     public Action<float> OnMicLoudness;
-
-    private AudioClip microphoneInput;
     private bool isMicrophoneInitialized = false;
-    public int sampleWindow = 64;
+
     
 
     void Awake()
@@ -54,17 +52,5 @@ public class MicrophoneManager : MonoBehaviour
         OnPlayerSpeech?.Invoke(text);
     }
 
-    void OnDestroy()
-    {
-        if (dictationRecognizer != null)
-        {
-            dictationRecognizer.DictationResult -= OnDictationResult;
-            dictationRecognizer.Dispose();
-        }
-
-        if (isMicrophoneInitialized)
-        {
-            Microphone.End(null);
-        }
-    }
+   
 }

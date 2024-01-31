@@ -30,6 +30,15 @@ public class SpeechDisplay : MonoBehaviour
             speechText.text = currentText;
             yield return null;
         }
+
+        // Start coroutine to clear text after 4 seconds
+        StartCoroutine(ClearTextAfterDelay(4f));
+    }
+
+    IEnumerator ClearTextAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        speechText.text = ""; // Clear the text
     }
 
     void OnDestroy()

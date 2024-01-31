@@ -25,7 +25,7 @@ public class NPCResponse : MonoBehaviour
     }
     public void RespondToPlayer3()
     {
-        string response = "I cannot do much else for you, but I can sing to distract him.";
+        string response = "I cannot do much for you, try to lock him inside one of the garages.";
         Debug.Log(response);
         OnNPCResponse?.Invoke(response);
     }
@@ -41,5 +41,10 @@ public class NPCResponse : MonoBehaviour
         Debug.Log(response);
         OnNPCResponse?.Invoke(response);
     }
-
+    public void RespondToPlayer6()
+    {
+        string response = "Thanks, you too that skincare routine has been paying off.";
+        Debug.Log(response);
+        OnNPCResponse?.Invoke(response);
+    }
 }

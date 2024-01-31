@@ -42,6 +42,10 @@ public class PlayerVoiceInteraction : MonoBehaviour
         {
             FindObjectOfType<NPCResponse>().RespondToPlayer5();
         }
+        if (isPlayerInRange && text.ToLower().Contains("good"))
+        {
+            FindObjectOfType<NPCResponse>().RespondToPlayer6();
+        }
 
     }
 
