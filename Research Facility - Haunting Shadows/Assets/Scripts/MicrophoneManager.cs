@@ -10,7 +10,7 @@ public class MicrophoneManager : MonoBehaviour
     private DictationRecognizer dictationRecognizer;
     public Action<string> OnPlayerSpeech;
     public Action<float> OnMicLoudness;
-    private bool isMicrophoneInitialized = false;
+
 
     
 
