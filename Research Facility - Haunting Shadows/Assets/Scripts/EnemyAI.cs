@@ -371,7 +371,8 @@ public class EnemyAI : MonoBehaviour
         clip.GetData(waveData, startPosition);
 
         float totalLoudness = 0;
-        foreach (var sample in waveData) {
+        foreach (var sample in waveData)
+        {
             totalLoudness += Mathf.Abs(sample);
         }
 
@@ -395,8 +396,8 @@ public class EnemyAI : MonoBehaviour
             walkingAudioSource.Stop();
             attackAudioSource.Stop();
         }
-        
-        
+
+
         // Stop audio if idle
         else if (IsIdle())
         {
@@ -411,7 +412,7 @@ public class EnemyAI : MonoBehaviour
         return !isChasingPlayer && !isSearchingForPlayer && agent.velocity.magnitude > 0.01f;
     }
 
-   
+
 
     bool IsIdle()
     {

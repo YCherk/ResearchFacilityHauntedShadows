@@ -7,6 +7,11 @@ public class UIManager : MonoBehaviour
     public static UIManager Instance { get; private set; }
 
     public Text collectText;
+    public Text transcriptText; // Text element for displaying spoken words
+    public Text speakPrompt; // Text element for the "Speak to Spirit" prompt
+    public PlayerVoiceInteraction playerVoiceInteraction; // Reference to PlayerVoiceInteraction script
+
+    private Coroutine hideTranscriptCoroutine;
 
     private void Awake()
     {
@@ -18,6 +23,14 @@ public class UIManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    private void Start()
+    {
+        // Subscribe to events from the PlayerVoiceInteraction script
+        playerVoiceInteraction.OnPlayerSpeech += HandleTranscriptDisplay;
+        playerVoiceInteraction.ShowSpeakPrompt += ShowSpeakPrompt;
+        playerVoiceInteraction.HideSpeakPrompt += HideSpeakPrompt;
     }
 
     public void ShowMessage(string message, float duration)
@@ -33,5 +46,42 @@ public class UIManager : MonoBehaviour
         yield return new WaitForSeconds(duration);
 
         collectText.gameObject.SetActive(false);
+    }
+
+    private void HandleTranscriptDisplay(string text)
+    {
+        if (hideTranscriptCoroutine != null)
+        {
+            StopCoroutine(hideTranscriptCoroutine);
+        }
+
+        transcriptText.text = text;
+        hideTranscriptCoroutine = StartCoroutine(HideTranscriptAfterDelay(6f)); // Hide after 4 seconds
+    }
+
+    IEnumerator HideTranscriptAfterDelay(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        transcriptText.text = "";
+    }
+
+    private void ShowSpeakPrompt()
+    {
+        speakPrompt.gameObject.SetActive(true);
+    }
+
+    private void HideSpeakPrompt()
+    {
+        speakPrompt.gameObject.SetActive(false);
+    }
+
+    void OnDestroy()
+    {
+        if (playerVoiceInteraction != null)
+        {
+            playerVoiceInteraction.OnPlayerSpeech -= HandleTranscriptDisplay;
+            playerVoiceInteraction.ShowSpeakPrompt -= ShowSpeakPrompt;
+            playerVoiceInteraction.HideSpeakPrompt -= HideSpeakPrompt;
+        }
     }
 }
