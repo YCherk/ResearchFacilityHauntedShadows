@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Windows.Speech;
 using System;
-using System.Linq;
+using System.Collections;
 
 public class MicrophoneManager : MonoBehaviour
 {
@@ -9,10 +9,9 @@ public class MicrophoneManager : MonoBehaviour
 
     private DictationRecognizer dictationRecognizer;
     public Action<string> OnPlayerSpeech;
-    public Action<float> OnMicLoudness;
 
-
-    
+    // Interval to check DictationRecognizer's status (in seconds)
+    private const float DictationRecognizerCheckInterval = 5f;
 
     void Awake()
     {
@@ -29,20 +28,31 @@ public class MicrophoneManager : MonoBehaviour
 
     void Start()
     {
-       
         StartDictationRecognizer();
-
+        StartCoroutine(CheckDictationRecognizerStatusRoutine());
     }
 
-    void Update()
+    void OnDestroy()
     {
-        
+        StopAndDisposeDictationRecognizer();
+        StopAllCoroutines(); // Ensure that all coroutines are stopped when the object is destroyed
     }
 
     void StartDictationRecognizer()
     {
+        if (dictationRecognizer != null)
+        {
+            if (dictationRecognizer.Status == SpeechSystemStatus.Running)
+            {
+                dictationRecognizer.Stop();
+            }
+            dictationRecognizer.Dispose();
+        }
+
         dictationRecognizer = new DictationRecognizer();
         dictationRecognizer.DictationResult += OnDictationResult;
+        dictationRecognizer.DictationError += OnDictationError;
+
         dictationRecognizer.Start();
     }
 
@@ -52,5 +62,40 @@ public class MicrophoneManager : MonoBehaviour
         OnPlayerSpeech?.Invoke(text);
     }
 
-   
+    private void OnDictationError(string error, int hresult)
+    {
+        Debug.LogError("Dictation error: " + error);
+        RestartDictationRecognizer(); // Automatically attempt to restart on error
+    }
+
+    private void StopAndDisposeDictationRecognizer()
+    {
+        if (dictationRecognizer != null)
+        {
+            if (dictationRecognizer.Status == SpeechSystemStatus.Running)
+            {
+                dictationRecognizer.Stop();
+            }
+            dictationRecognizer.Dispose();
+        }
+    }
+
+    private void RestartDictationRecognizer()
+    {
+        StopAndDisposeDictationRecognizer();
+        StartDictationRecognizer();
+    }
+
+    IEnumerator CheckDictationRecognizerStatusRoutine()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(DictationRecognizerCheckInterval);
+            // Check if the DictationRecognizer is not running and restart it
+            if (dictationRecognizer == null || dictationRecognizer.Status != SpeechSystemStatus.Running)
+            {
+                RestartDictationRecognizer();
+            }
+        }
+    }
 }

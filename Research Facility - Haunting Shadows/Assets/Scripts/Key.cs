@@ -1,49 +1,15 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 public class Key : MonoBehaviour
 {
-    private Text pickupPrompt; // Reference to the UI Text for the pickup prompt
-    private bool playerInRange = false; // Flag to check if the player is in range
-
-    private void Start()
-    {
-        // Find the UI Text component in the scene
-        pickupPrompt = GameObject.Find("KeyPrompt").GetComponent<Text>();
-
-        if (pickupPrompt != null)
-        {
-            pickupPrompt.text = ""; // Initially hide the prompt
-        }
-        else
-        {
-            Debug.LogError("Pickup prompt UI Text not found in the scene.");
-        }
-    }
-
-    private void Update()
-    {
-        // Check if the player is in range and the E key is pressed
-        if (playerInRange && Input.GetKeyDown(KeyCode.E))
-        {
-            KeyManager.Instance.AddKey();
-            if (pickupPrompt != null)
-            {
-                pickupPrompt.text = ""; // Hide the prompt
-            }
-            Destroy(gameObject); // Destroy the key object
-        }
-    }
+    private bool playerInRange = false;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            playerInRange = true; // Set flag to true
-            if (pickupPrompt != null)
-            {
-                pickupPrompt.text = "Press [E] to collect"; // Show the prompt
-            }
+            playerInRange = true;
+            UIManager.Instance.ShowKeyPrompt("Press [E] to collect"); // Use the specific method for key prompts
         }
     }
 
@@ -51,11 +17,18 @@ public class Key : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            playerInRange = false; // Set flag to false
-            if (pickupPrompt != null)
-            {
-                pickupPrompt.text = ""; // Hide the prompt
-            }
+            playerInRange = false;
+            UIManager.Instance.HideKeyPrompt(); // Specifically hide the key prompt
+        }
+    }
+
+    private void Update()
+    {
+        if (playerInRange && Input.GetKeyDown(KeyCode.E))
+        {
+            KeyManager.Instance.AddKey(); // Assuming this method manages the collected keys
+            UIManager.Instance.HideKeyPrompt(); // Hide the prompt once the key is collected
+            Destroy(gameObject); // Remove the key object from the scene
         }
     }
 }

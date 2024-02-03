@@ -10,7 +10,13 @@ public class PlayerVoiceInteraction : MonoBehaviour
 
     void Start()
     {
+        // Subscribe to the OnPlayerSpeech event from the MicrophoneManager
         MicrophoneManager.Instance.OnPlayerSpeech += OnPlayerSpeechDetected;
+
+        // Setup the actions to show and hide the speak prompt via UIManager
+        ShowSpeakPrompt += UIManager.Instance.ShowSpeakPrompt;
+        HideSpeakPrompt += UIManager.Instance.HideSpeakPrompt;
+
     }
 
     private void OnPlayerSpeechDetected(string text)
@@ -18,35 +24,43 @@ public class PlayerVoiceInteraction : MonoBehaviour
         Debug.Log("Player said: " + text);
         OnPlayerSpeech?.Invoke(text);
 
-        if (isPlayerInRange && text.ToLower().Contains("hello"))
-        {
-            FindObjectOfType<NPCResponse>().RespondToPlayer();
-        }
-        if (isPlayerInRange && text.ToLower().Contains("who are you"))
-        {
-            FindObjectOfType<NPCResponse>().RespondToPlayer1();
-        }
-        if (isPlayerInRange && text.ToLower().Contains("escape"))
-        {
-            FindObjectOfType<NPCResponse>().RespondToPlayer2();
-        }
-        if (isPlayerInRange && text.ToLower().Contains("help me"))
-        {
-            FindObjectOfType<NPCResponse>().RespondToPlayer3();
-        }
-        if (isPlayerInRange && text.ToLower().Contains("key"))
-        {
-            FindObjectOfType<NPCResponse>().RespondToPlayer4();
-        }
-        if (isPlayerInRange && text.ToLower().Contains("story"))
-        {
-            FindObjectOfType<NPCResponse>().RespondToPlayer5();
-        }
-        if (isPlayerInRange && text.ToLower().Contains("good"))
-        {
-            FindObjectOfType<NPCResponse>().RespondToPlayer6();
-        }
+        // Process the speech and trigger NPC responses based on certain keywords
+        ProcessSpeechAndTriggerResponses(text.ToLower());
+    }
 
+    private void ProcessSpeechAndTriggerResponses(string spokenText)
+    {
+        if (isPlayerInRange)
+        {
+            if (spokenText.Contains("hello"))
+            {
+                FindObjectOfType<NPCResponse>().RespondToPlayer();
+            }
+            else if (spokenText.Contains("who are you"))
+            {
+                FindObjectOfType<NPCResponse>().RespondToPlayer1();
+            }
+            else if (spokenText.Contains("escape"))
+            {
+                FindObjectOfType<NPCResponse>().RespondToPlayer2();
+            }
+            else if (spokenText.Contains("help me"))
+            {
+                FindObjectOfType<NPCResponse>().RespondToPlayer3();
+            }
+            else if (spokenText.Contains("key"))
+            {
+                FindObjectOfType<NPCResponse>().RespondToPlayer4();
+            }
+            else if (spokenText.Contains("story"))
+            {
+                FindObjectOfType<NPCResponse>().RespondToPlayer5();
+            }
+            else if (spokenText.Contains("good"))
+            {
+                FindObjectOfType<NPCResponse>().RespondToPlayer6();
+            }
+        }
     }
 
     private void OnTriggerEnter(Collider other)
@@ -69,6 +83,7 @@ public class PlayerVoiceInteraction : MonoBehaviour
 
     void OnDestroy()
     {
+        // Clean up by unsubscribing from the MicrophoneManager's event when this object is destroyed
         if (MicrophoneManager.Instance != null)
         {
             MicrophoneManager.Instance.OnPlayerSpeech -= OnPlayerSpeechDetected;

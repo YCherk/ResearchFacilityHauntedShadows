@@ -7,7 +7,7 @@ public class RandomAudioPlayer : MonoBehaviour
     public float minDelay = 5f;
     public float maxDelay = 15f;
 
-    private AudioSource audioSource;
+    public AudioSource audioSource;
 
     void Start()
     {

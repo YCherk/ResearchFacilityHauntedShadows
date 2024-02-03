@@ -6,9 +6,11 @@ public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
 
-    public Text collectText;
+    public Text collectText; // Text element for general messages
     public Text transcriptText; // Text element for displaying spoken words
     public Text speakPrompt; // Text element for the "Speak to Spirit" prompt
+    public Text keyPromptText; // Text element for the key collection prompt
+
     public PlayerVoiceInteraction playerVoiceInteraction; // Reference to PlayerVoiceInteraction script
 
     private Coroutine hideTranscriptCoroutine;
@@ -18,6 +20,7 @@ public class UIManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            DontDestroyOnLoad(gameObject); // Keep UIManager across scenes
         }
         else
         {
@@ -27,15 +30,29 @@ public class UIManager : MonoBehaviour
 
     private void Start()
     {
-        // Subscribe to events from the PlayerVoiceInteraction script
-        playerVoiceInteraction.OnPlayerSpeech += HandleTranscriptDisplay;
-        playerVoiceInteraction.ShowSpeakPrompt += ShowSpeakPrompt;
-        playerVoiceInteraction.HideSpeakPrompt += HideSpeakPrompt;
+        // It's assumed that playerVoiceInteraction is assigned in the Unity Editor or elsewhere before Start.
+        if (playerVoiceInteraction != null)
+        {
+            playerVoiceInteraction.OnPlayerSpeech += HandleTranscriptDisplay;
+            playerVoiceInteraction.ShowSpeakPrompt += ShowSpeakPrompt;
+            playerVoiceInteraction.HideSpeakPrompt += HideSpeakPrompt;
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: PlayerVoiceInteraction reference not set.");
+        }
     }
 
     public void ShowMessage(string message, float duration)
     {
-        StartCoroutine(DisplayMessage(message, duration));
+        if (collectText != null)
+        {
+            StartCoroutine(DisplayMessage(message, duration));
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: CollectText UI element not set.");
+        }
     }
 
     private IEnumerator DisplayMessage(string message, float duration)
@@ -48,15 +65,43 @@ public class UIManager : MonoBehaviour
         collectText.gameObject.SetActive(false);
     }
 
+    public void ShowKeyPrompt(string message)
+    {
+        if (keyPromptText != null)
+        {
+            keyPromptText.text = message;
+            keyPromptText.gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: KeyPromptText UI element not set.");
+        }
+    }
+
+    public void HideKeyPrompt()
+    {
+        if (keyPromptText != null)
+        {
+            keyPromptText.gameObject.SetActive(false);
+        }
+    }
+
     private void HandleTranscriptDisplay(string text)
     {
-        if (hideTranscriptCoroutine != null)
+        if (transcriptText != null)
         {
-            StopCoroutine(hideTranscriptCoroutine);
-        }
+            if (hideTranscriptCoroutine != null)
+            {
+                StopCoroutine(hideTranscriptCoroutine);
+            }
 
-        transcriptText.text = text;
-        hideTranscriptCoroutine = StartCoroutine(HideTranscriptAfterDelay(6f)); // Hide after 4 seconds
+            transcriptText.text = text;
+            hideTranscriptCoroutine = StartCoroutine(HideTranscriptAfterDelay(6f));
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: TranscriptText UI element not set.");
+        }
     }
 
     IEnumerator HideTranscriptAfterDelay(float delay)
@@ -65,18 +110,31 @@ public class UIManager : MonoBehaviour
         transcriptText.text = "";
     }
 
-    private void ShowSpeakPrompt()
+    public void ShowSpeakPrompt()
     {
-        speakPrompt.gameObject.SetActive(true);
+        Debug.Log("Showing speak prompt.");
+        if (speakPrompt != null)
+        {
+            speakPrompt.gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.LogError("SpeakPrompt is not assigned in UIManager.");
+        }
     }
 
-    private void HideSpeakPrompt()
+
+    public void HideSpeakPrompt()
     {
-        speakPrompt.gameObject.SetActive(false);
+        if (speakPrompt != null)
+        {
+            speakPrompt.gameObject.SetActive(false);
+        }
     }
 
     void OnDestroy()
     {
+        // Clean up event subscriptions when the UIManager is destroyed
         if (playerVoiceInteraction != null)
         {
             playerVoiceInteraction.OnPlayerSpeech -= HandleTranscriptDisplay;
