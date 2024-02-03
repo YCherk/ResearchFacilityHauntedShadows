@@ -14,7 +14,7 @@ public class Door : MonoBehaviour
 
     private void Start()
     {
-        doorPrompt.text = "";
+        // No need to set doorPrompt text here
         fadePanel.gameObject.SetActive(false);
     }
 
@@ -23,7 +23,7 @@ public class Door : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerNear = true;
-            doorPrompt.text = "Press [E] to open the door";
+            UIManager.Instance.ShowDoorPrompt("Press [E] to open the door");
         }
     }
 
@@ -32,7 +32,7 @@ public class Door : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             isPlayerNear = false;
-            doorPrompt.text = "";
+            UIManager.Instance.HideDoorPrompt();
         }
     }
 
@@ -40,19 +40,17 @@ public class Door : MonoBehaviour
     {
         if (isPlayerNear && Input.GetKeyDown(KeyCode.E))
         {
-            // Access keysCollected and totalKeys via the KeyManager instance
             if (KeyManager.Instance.keysCollected >= KeyManager.Instance.totalKeys)
             {
                 StartCoroutine(OpenDoor());
             }
             else
             {
-                doorPrompt.text = "Not enough keys";
+                UIManager.Instance.ShowDoorPrompt("Not enough keys");
                 StartCoroutine(HidePromptAfterDelay());
             }
         }
     }
-
 
     private IEnumerator OpenDoor()
     {
@@ -71,6 +69,6 @@ public class Door : MonoBehaviour
     private IEnumerator HidePromptAfterDelay()
     {
         yield return new WaitForSeconds(2f);
-        doorPrompt.text = "";
+        UIManager.Instance.HideDoorPrompt();
     }
 }

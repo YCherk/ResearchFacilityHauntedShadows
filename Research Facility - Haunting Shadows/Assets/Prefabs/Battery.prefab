@@ -12,8 +12,8 @@ GameObject:
   - component: {fileID: 4215712396370247111}
   - component: {fileID: 4226512729306225633}
   - component: {fileID: 4297893094262240839}
-  - component: {fileID: 7221926797793241023}
   - component: {fileID: 2312645911200020884}
+  - component: {fileID: 1717298876146926880}
   m_Layer: 0
   m_Name: battery
   m_TagString: Untagged
@@ -107,8 +107,23 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!65 &7221926797793241023
-BoxCollider:
+--- !u!114 &2312645911200020884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4248920011462585283}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c4d40fc7be992d441a205be5fe6ba07c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  pickupType: 0
+  pickupPrompt: {fileID: 0}
+  collectText: {fileID: 0}
+--- !u!136 &1717298876146926880
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -125,23 +140,11 @@ BoxCollider:
   m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 2}
-  m_Center: {x: 0, y: 0.005438015, z: 0}
---- !u!114 &2312645911200020884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4248920011462585283}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c4d40fc7be992d441a205be5fe6ba07c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  pickupPrompt: {fileID: 0}
-  collectText: {fileID: 0}
+  serializedVersion: 2
+  m_Radius: 0.19507846
+  m_Height: 0.74437004
+  m_Direction: 1
+  m_Center: {x: 0.118377924, y: -0.0574134, z: -6.9737827e-12}
 --- !u!1 &7520380773804633576
 GameObject:
   m_ObjectHideFlags: 0

@@ -158,8 +158,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 2, y: 2, z: 2}
-  m_Center: {x: 0, y: 0.005438015, z: 0}
+  m_Size: {x: 0.95329815, y: 0.40513474, z: 1.3068666}
+  m_Center: {x: -0.035818428, y: 0.22476187, z: 0.34656674}
 --- !u!114 &5053641918652177355
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -173,3 +173,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pickupPrompt: {fileID: 0}
+  medkitcollectText: {fileID: 0}

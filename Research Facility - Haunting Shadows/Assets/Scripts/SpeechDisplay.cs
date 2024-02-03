@@ -7,12 +7,14 @@ public class SpeechDisplay : MonoBehaviour
     public Text speechText;
     public PlayerVoiceInteraction playerVoiceInteraction;
     public NPCResponse npcResponse;
+    public NPCResponse npcResponse1;
     private string currentText = "";
 
     void Start()
     {
         playerVoiceInteraction.OnPlayerSpeech += DisplaySpeech;
         npcResponse.OnNPCResponse += DisplaySpeech;
+        npcResponse1.OnNPCResponse += DisplaySpeech;
     }
 
     private void DisplaySpeech(string text)
@@ -45,5 +47,6 @@ public class SpeechDisplay : MonoBehaviour
     {
         playerVoiceInteraction.OnPlayerSpeech -= DisplaySpeech;
         npcResponse.OnNPCResponse -= DisplaySpeech;
+        npcResponse1.OnNPCResponse -= DisplaySpeech;
     }
 }

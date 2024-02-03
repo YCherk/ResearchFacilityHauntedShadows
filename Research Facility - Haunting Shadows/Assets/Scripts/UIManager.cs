@@ -13,6 +13,8 @@ public class UIManager : MonoBehaviour
 
     public PlayerVoiceInteraction playerVoiceInteraction; // Reference to PlayerVoiceInteraction script
 
+    public Text doorPromptText;
+
     private Coroutine hideTranscriptCoroutine;
 
     private void Awake()
@@ -112,7 +114,7 @@ public class UIManager : MonoBehaviour
 
     public void ShowSpeakPrompt()
     {
-        Debug.Log("Showing speak prompt.");
+        
         if (speakPrompt != null)
         {
             speakPrompt.gameObject.SetActive(true);
@@ -129,6 +131,26 @@ public class UIManager : MonoBehaviour
         if (speakPrompt != null)
         {
             speakPrompt.gameObject.SetActive(false);
+        }
+    }
+    public void ShowDoorPrompt(string message)
+    {
+        if (doorPromptText != null)
+        {
+            doorPromptText.text = message;
+            doorPromptText.gameObject.SetActive(true);
+        }
+        else
+        {
+            Debug.LogWarning("UIManager: DoorPromptText UI element not set.");
+        }
+    }
+
+    public void HideDoorPrompt()
+    {
+        if (doorPromptText != null)
+        {
+            doorPromptText.gameObject.SetActive(false);
         }
     }
 

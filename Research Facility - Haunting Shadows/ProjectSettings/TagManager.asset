@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Door
   - NPC
+  - KeyPromptTag
   layers:
   - Default
   - TransparentFX
@@ -15,7 +16,7 @@ TagManager:
   - UI
   - Enemy
   - Trees
-  - 
+  - PostProcessing
   - 
   - 
   - 
