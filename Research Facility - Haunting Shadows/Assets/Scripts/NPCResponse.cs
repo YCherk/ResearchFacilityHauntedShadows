@@ -31,7 +31,7 @@ public class NPCResponse : MonoBehaviour
     }
     public void RespondToPlayer4()
     {
-        string response = "This is my only key, I was looking to escape too but you can take it, I am stuck here forever anyways.";
+        string response = "I do not know where the keys are. Look for them yourself.";
         Debug.Log(response);
         OnNPCResponse?.Invoke(response);
     }
@@ -44,6 +44,18 @@ public class NPCResponse : MonoBehaviour
     public void RespondToPlayer6()
     {
         string response = "Thanks, you too that skincare routine has been paying off.";
+        Debug.Log(response);
+        OnNPCResponse?.Invoke(response);
+    }
+    public void RespondToPlayer7()
+    {
+        string response = "You are very much welcome.";
+        Debug.Log(response);
+        OnNPCResponse?.Invoke(response);
+    }
+    public void RespondToPlayer8()
+    {
+        string response = "I am not going anywhere.";
         Debug.Log(response);
         OnNPCResponse?.Invoke(response);
     }

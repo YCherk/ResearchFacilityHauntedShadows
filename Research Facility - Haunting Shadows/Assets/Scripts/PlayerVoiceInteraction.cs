@@ -60,6 +60,14 @@ public class PlayerVoiceInteraction : MonoBehaviour
             {
                 FindObjectOfType<NPCResponse>().RespondToPlayer6();
             }
+            else if (spokenText.Contains("thank"))
+            {
+                FindObjectOfType<NPCResponse>().RespondToPlayer7();
+            }
+            else if (spokenText.Contains("go away"))
+            {
+                FindObjectOfType<NPCResponse>().RespondToPlayer8();
+            }
         }
     }
 

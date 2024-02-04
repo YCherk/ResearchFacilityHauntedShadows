@@ -62,8 +62,7 @@ public class EnemyAI : MonoBehaviour
     public float minFlickerDuration = 0.1f;
     public float maxFlickerDuration = 0.5f;
     private Coroutine flickerCoroutine = null;
-    private bool dialoguePlayedForSpotting = false;
-    private bool dialoguePlayedForScream = false;
+  
 
     void Start()
     {
@@ -103,14 +102,7 @@ public class EnemyAI : MonoBehaviour
                 lastKnownPlayerPosition = player.position;
                 agent.SetDestination(player.position);
                 animator.SetBool("isRunning", true);
-                ManageFlickering();
                 PlayRandomAudioClip();
-
-                if (!dialoguePlayedForScream)
-                {
-                    StartCoroutine(DisplayDialogue("Oh Shit.", 2));
-                    dialoguePlayedForScream = true;
-                }
             }
         }
 
@@ -123,12 +115,6 @@ public class EnemyAI : MonoBehaviour
             agent.SetDestination(player.position);
             animator.SetBool("isRunning", true);
             ManageFlickering();
-
-            if (!dialoguePlayedForSpotting)
-            {
-                StartCoroutine(DisplayDialogue("Fuck he saw me, I need to hide", 2));
-                dialoguePlayedForSpotting = true;
-            }
 
             chaseDuration += Time.deltaTime;
 
@@ -196,10 +182,11 @@ public class EnemyAI : MonoBehaviour
         {
             if (hitCollider.CompareTag("Door")) // Ensure your door has the tag "Door"
             {
-                knockOnDoor.Play();
+                
                 DoorController door = hitCollider.GetComponent<DoorController>();
                 if (door != null)
                 {
+                    knockOnDoor.Play();
                     door.ForceOpenDoor(); // Force the door open
                 }
             }
