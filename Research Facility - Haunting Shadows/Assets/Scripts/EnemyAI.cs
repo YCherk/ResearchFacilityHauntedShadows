@@ -453,21 +453,33 @@ public class EnemyAI : MonoBehaviour
 
     void Patrol()
     {
-        timer += Time.deltaTime;
-        animator.SetBool("WalkForward", true);
-
-        if (timer >= patrolTimer)
+        // Check if the enemy has reached its current destination or if there's no path currently being computed
+        if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance)
         {
-            Vector3 newPos = RandomNavSphere(transform.position, patrolRadius, -1);
-            agent.SetDestination(newPos);
+            // Only increment the timer if the agent has stopped moving, indicating it has reached the destination
+            if (agent.velocity.sqrMagnitude == 0f)
+            {
+                timer += Time.deltaTime;
+            }
+
+            // When the timer exceeds the patrolTimer, find a new patrol point
+            if (timer >= patrolTimer)
+            {
+                Vector3 newPos = RandomNavSphere(transform.position, patrolRadius, -1);
+                agent.SetDestination(newPos);
+                timer = 0; // Reset the timer after setting a new destination
+            }
+        }
+        else
+        {
+            // Reset the timer if the agent is moving towards a destination
             timer = 0;
         }
 
-        if (agent.velocity.magnitude > 0.01f && !walkingAudioSource.isPlaying)
-        {
-            walkingAudioSource.Play();
-        }
+        // Optionally, adjust the animation based on whether the agent is moving or not
+        animator.SetBool("WalkForward", agent.velocity.magnitude > 0.1f);
     }
+
 
     public static Vector3 RandomNavSphere(Vector3 origin, float dist, int layermask)
     {
