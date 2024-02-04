@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class EnemyAI : MonoBehaviour
 {
+
+
     public float timeToOpenDoor = 10f; // Time the enemy will wait before opening the door
     private float doorTimer = 0f; // Timer to track the waiting time
 
@@ -186,7 +188,7 @@ public class EnemyAI : MonoBehaviour
                 DoorController door = hitCollider.GetComponent<DoorController>();
                 if (door != null)
                 {
-                    knockOnDoor.Play();
+                    
                     door.ForceOpenDoor(); // Force the door open
                 }
             }
@@ -201,15 +203,7 @@ public class EnemyAI : MonoBehaviour
         sensitivity = newSensitivity;
         loudnessThreshold = newLoudnessThreshold;
     }
-    private IEnumerator DisplayDialogue(string message, float duration)
-    {
-        dialogueScreamText.text = message;
-        dialogueScreamText.gameObject.SetActive(true);
-
-        yield return new WaitForSeconds(duration);
-
-        dialogueScreamText.gameObject.SetActive(false);
-    }
+  
     private void ManageFlickering()
     {
         if (flickerCoroutine == null)
@@ -499,10 +493,14 @@ public class EnemyAI : MonoBehaviour
 
     private void TurnTowardsPlayer()
     {
-        if (!isChasingPlayer) return; // Only turn towards player if chasing
+        if (!isChasingPlayer || Vector3.Distance(transform.position, player.position) <= attackDistance) return; // Add distance check to prevent spinning when close
 
         Vector3 directionToPlayer = (player.position - transform.position).normalized;
-        Quaternion lookRotation = Quaternion.LookRotation(new Vector3(directionToPlayer.x, 0, directionToPlayer.z));
-        transform.rotation = Quaternion.Slerp(transform.rotation, lookRotation, Time.deltaTime * 5f);
+        // Eliminate any pitch difference to keep the rotation strictly horizontal
+        directionToPlayer.y = 0;
+
+        Quaternion targetRotation = Quaternion.LookRotation(directionToPlayer);
+        transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, Time.deltaTime * 100f); // Adjust rotation speed as needed
     }
+
 }

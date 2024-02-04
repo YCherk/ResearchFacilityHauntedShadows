@@ -2,6 +2,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using Unity.VisualScripting;
+
 public class IntroSceneEffect : MonoBehaviour
 {
     public Text storyText; // Assign this in the inspector
@@ -14,6 +16,7 @@ public class IntroSceneEffect : MonoBehaviour
         StartCoroutine(TypeOutText());
         TypeWriterSound.Play();
     }
+    
 
     IEnumerator TypeOutText()
     {

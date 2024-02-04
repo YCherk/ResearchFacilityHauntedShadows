@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 public class DoorInteraction : MonoBehaviour
 {
-    public Text interactionText; // Assign this in the Inspector
+    public Text interactionText; 
     private DoorController doorController;
     private bool playerInRange = false;
 
@@ -15,7 +15,7 @@ public class DoorInteraction : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")) // Ensure your player has the tag "Player"
+        if (other.CompareTag("Player")) 
         {
             playerInRange = true;
             interactionText.text = "Press [E]";
