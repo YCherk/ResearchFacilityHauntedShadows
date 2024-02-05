@@ -229,7 +229,7 @@ public class EnemyAI : MonoBehaviour
             float flickerTime = Random.Range(minFlickerDuration, maxFlickerDuration);
 
             SetEnemyVisibility(!IsEnemyVisible());
-            agent.speed = IsEnemyVisible() ? chaseSpeed : chaseSpeed * 2;
+            agent.speed = (float)(IsEnemyVisible() ? chaseSpeed : chaseSpeed * 1.5);
 
             yield return new WaitForSeconds(flickerTime);
         }
