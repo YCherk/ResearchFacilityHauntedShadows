@@ -10,6 +10,8 @@ public class KeyAndLanternSpawner : MonoBehaviour
     public int maxAttemptsPerKey = 1000;
     public float lanternSpawnOffset = 1f;
     public Vector2 searchAreaSize = new Vector2(50f, 50f); // Size of the area in which to search for spawn points
+    public LayerMask groundLayer; // Layer mask to identify the ground layer
+    public float maxGroundCheckDistance = 10f; // Maximum distance to check for ground
 
     private DifficultyManager difficultyManager;
     private List<Vector3> spawnPoints = new List<Vector3>();
@@ -54,7 +56,6 @@ public class KeyAndLanternSpawner : MonoBehaviour
         }
     }
 
-
     Vector3 TrySpawnKey()
     {
         for (int attempts = 0; attempts < maxAttemptsPerKey; attempts++)
@@ -65,10 +66,20 @@ public class KeyAndLanternSpawner : MonoBehaviour
                 Random.Range(-searchAreaSize.y / 2, searchAreaSize.y / 2)
             ) + transform.position;
 
-            NavMeshHit hit;
-            if (NavMesh.SamplePosition(randomPoint, out hit, searchRadius, NavMesh.AllAreas))
+            // Adjust vertical position to be at ground level
+            if (Physics.Raycast(randomPoint + Vector3.up * maxGroundCheckDistance, Vector3.down, out RaycastHit hitInfo, maxGroundCheckDistance * 2, groundLayer))
             {
-                Vector3 spawnPoint = hit.position;
+                randomPoint.y = hitInfo.point.y;
+            }
+            else
+            {
+                continue; // Skip this location if no ground was found below
+            }
+
+            NavMeshHit navMeshHit;
+            if (NavMesh.SamplePosition(randomPoint, out navMeshHit, searchRadius, NavMesh.AllAreas))
+            {
+                Vector3 spawnPoint = navMeshHit.position;
 
                 if (!IsPointTooCloseToOthers(spawnPoint))
                 {
@@ -89,10 +100,10 @@ public class KeyAndLanternSpawner : MonoBehaviour
         offset.y = 0;
         Vector3 lanternPosition = keyPosition + offset;
 
-        NavMeshHit hit;
-        if (NavMesh.SamplePosition(lanternPosition, out hit, lanternSpawnOffset, NavMesh.AllAreas))
+        NavMeshHit navMeshHit;
+        if (NavMesh.SamplePosition(lanternPosition, out navMeshHit, lanternSpawnOffset, NavMesh.AllAreas))
         {
-            Instantiate(lanternPrefab, hit.position, Quaternion.identity);
+            Instantiate(lanternPrefab, navMeshHit.position, Quaternion.identity);
         }
         else
         {

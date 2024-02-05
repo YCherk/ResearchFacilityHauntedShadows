@@ -8324,7 +8324,7 @@ GameObject:
   - component: {fileID: 887530303}
   - component: {fileID: 887530302}
   - component: {fileID: 887530306}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Terrain
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -13801,6 +13801,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 6c9e41e24d2bc6b488c927f43944457b, type: 3}
+--- !u!4 &1357848188 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4459864851508666808, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+  m_PrefabInstance: {fileID: 2126566683}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &1362665611 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4339898394216490, guid: 6c9e41e24d2bc6b488c927f43944457b, type: 3}
@@ -15455,6 +15460,10 @@ MonoBehaviour:
   maxAttemptsPerKey: 10000
   lanternSpawnOffset: 1.5
   searchAreaSize: {x: 500.7, y: 500}
+  groundLayer:
+    serializedVersion: 2
+    m_Bits: 512
+  maxGroundCheckDistance: 10
 --- !u!4 &1591304258
 Transform:
   m_ObjectHideFlags: 0
@@ -21253,6 +21262,10 @@ PrefabInstance:
       propertyPath: bobAmount.y
       value: 0.05
       objectReference: {fileID: 0}
+    - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
+      propertyPath: cameraJoint
+      value: 
+      objectReference: {fileID: 1357848188}
     - target: {fileID: 4459864850019384740, guid: 6bacecc4f3df9584198879c73a6b6c36, type: 3}
       propertyPath: sprintSpeed
       value: 4.9
