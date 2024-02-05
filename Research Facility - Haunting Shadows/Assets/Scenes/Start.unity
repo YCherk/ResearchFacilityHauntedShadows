@@ -810,23 +810,23 @@ MonoBehaviour:
   mediumKeys: 7
   hardKeys: 10
   enemyAI: {fileID: 7641856791011886575}
-  easyChaseSpeed: 2
+  easyChaseSpeed: 3
   easySightDistance: 15
   easyAttackDistance: 3
   easyFieldOfView: 120
-  easySensitivity: 250
+  easySensitivity: 350
   easyLoudnessThreshold: 50
-  mediumChaseSpeed: 3
+  mediumChaseSpeed: 4
   mediumSightDistance: 20
   mediumAttackDistance: 3
   mediumFieldOfView: 180
-  mediumSensitivity: 250
+  mediumSensitivity: 350
   mediumLoudnessThreshold: 25
   hardChaseSpeed: 5
   hardSightDistance: 40
   hardAttackDistance: 3
   hardFieldOfView: 300
-  hardSensitivity: 250
+  hardSensitivity: 350
   hardLoudnessThreshold: 10
 --- !u!82 &55081529
 AudioSource:
@@ -9332,9 +9332,9 @@ Light:
   serializedVersion: 10
   m_Type: 0
   m_Shape: 0
-  m_Color: {r: 1, g: 0.9612993, b: 0.9103774, a: 1}
+  m_Color: {r: 1, g: 0.7600492, b: 0.4481132, a: 1}
   m_Intensity: 1.2
-  m_Range: 20
+  m_Range: 50
   m_SpotAngle: 70
   m_InnerSpotAngle: 1
   m_CookieSize: 10
@@ -23894,7 +23894,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7068073224048704694, guid: fbb7800f0c359e14b9f79f402e8f74b3, type: 3}
       propertyPath: timeToOpenDoor
-      value: 6
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7068073224048704694, guid: fbb7800f0c359e14b9f79f402e8f74b3, type: 3}
       propertyPath: audioPlayChance
@@ -23930,7 +23930,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7068073224048704694, guid: fbb7800f0c359e14b9f79f402e8f74b3, type: 3}
       propertyPath: timeToGiveUpChase
-      value: 10
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 7068073224048704694, guid: fbb7800f0c359e14b9f79f402e8f74b3, type: 3}
       propertyPath: dialogueScreamText
