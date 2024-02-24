@@ -33668,7 +33668,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7068073224048704694, guid: fbb7800f0c359e14b9f79f402e8f74b3, type: 3}
       propertyPath: timeToGiveUpChase
-      value: 15
+      value: 4
       objectReference: {fileID: 0}
     - target: {fileID: 7068073224048704694, guid: fbb7800f0c359e14b9f79f402e8f74b3, type: 3}
       propertyPath: dialogueScreamText
