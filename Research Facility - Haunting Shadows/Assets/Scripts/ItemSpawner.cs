@@ -1,9 +1,8 @@
-// Necessary imports for using Unity's engine, navigation, and collections
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
-// A class to dynamically spawn keys and lanterns in the game environment
+
 public class KeyAndLanternSpawner : MonoBehaviour
 {
     // References to the key and lantern prefabs that will be spawned

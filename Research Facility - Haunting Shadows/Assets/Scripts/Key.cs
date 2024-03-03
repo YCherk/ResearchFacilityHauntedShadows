@@ -9,7 +9,7 @@ public class Key : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = true;
-            UIManager.Instance.ShowKeyPrompt("Press [E] to collect"); // Use the specific method for key prompts
+            UIManager.Instance.ShowKeyPrompt("Press [E] to collect"); 
         }
     }
 
@@ -18,7 +18,7 @@ public class Key : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             playerInRange = false;
-            UIManager.Instance.HideKeyPrompt(); // Specifically hide the key prompt
+            UIManager.Instance.HideKeyPrompt(); 
         }
     }
 
@@ -26,9 +26,9 @@ public class Key : MonoBehaviour
     {
         if (playerInRange && Input.GetKeyDown(KeyCode.E))
         {
-            KeyManager.Instance.AddKey(); // Assuming this method manages the collected keys
-            UIManager.Instance.HideKeyPrompt(); // Hide the prompt once the key is collected
-            Destroy(gameObject); // Remove the key object from the scene
+            KeyManager.Instance.AddKey(); 
+            UIManager.Instance.HideKeyPrompt(); // hide the prompt once the key is collected
+            Destroy(gameObject); // remove the key object from the scene
         }
     }
 }
