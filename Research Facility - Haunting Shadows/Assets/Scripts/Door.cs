@@ -14,7 +14,7 @@ public class Door : MonoBehaviour
 
     private void Start()
     {
-        // No need to set doorPrompt text here
+        
         fadePanel.gameObject.SetActive(false);
     }
 

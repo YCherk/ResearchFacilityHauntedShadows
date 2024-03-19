@@ -17161,8 +17161,8 @@ MonoBehaviour:
   transcriptText: {fileID: 1656695194}
   speakPrompt: {fileID: 1656695194}
   keyPromptText: {fileID: 813887626}
-  playerVoiceInteraction: {fileID: 55081537}
   doorPromptText: {fileID: 579068834}
+  playerVoiceInteraction: {fileID: 55081537}
 --- !u!224 &1151963923
 RectTransform:
   m_ObjectHideFlags: 0
@@ -29875,6 +29875,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pickupPrompt: {fileID: 0}
+  isPlayerInRange: 0
   medkitcollectText: {fileID: 0}
 --- !u!65 &2082480628
 BoxCollider:

@@ -6,7 +6,7 @@ using Unity.VisualScripting;
 
 public class IntroSceneEffect : MonoBehaviour
 {
-    public Text storyText; // Assign this in the inspector
+    public Text storyText; 
     public string fullText; // Full story text
     public float typingSpeed = 0.05f; // Speed of typing
     public AudioSource TypeWriterSound;
