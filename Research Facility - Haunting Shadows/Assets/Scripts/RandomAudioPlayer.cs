@@ -31,7 +31,7 @@ public class RandomAudioPlayer : MonoBehaviour
                 {
                     AudioClip clip = clips[Random.Range(0, clips.Length)];
                     audioSource.clip = clip;
-                    audioSource.Play(); // Use Play() to respect AudioSource settings
+                    audioSource.Play();
                 }
             }
         }

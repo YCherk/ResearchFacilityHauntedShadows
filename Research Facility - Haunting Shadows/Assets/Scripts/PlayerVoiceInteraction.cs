@@ -91,7 +91,7 @@ public class PlayerVoiceInteraction : MonoBehaviour
 
     void OnDestroy()
     {
-        // Clean up by unsubscribing from the MicrophoneManager's event when this object is destroyed
+       
         if (MicrophoneManager.Instance != null)
         {
             MicrophoneManager.Instance.OnPlayerSpeech -= OnPlayerSpeechDetected;
